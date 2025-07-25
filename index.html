@@ -18,6 +18,7 @@
       height: 60px;
     }
 
+    /* Menu button (top-left) */
     .menu-btn {
       position: absolute;
       top: 0;
@@ -30,9 +31,10 @@
       font-size: 20px;
       cursor: pointer;
       height: 60px;
-      z-index: 200;
+      z-index: 200; /* above menu */
     }
 
+    /* Call button (top-right) */
     .call-btn {
       position: absolute;
       top: 0;
@@ -48,9 +50,10 @@
       height: 60px;
       display: flex;
       align-items: center;
-      z-index: 200;
+      z-index: 200; /* above menu */
     }
 
+    /* Centered title */
     .top-bar-title {
       position: absolute;
       top: 0;
@@ -68,10 +71,11 @@
       white-space: nowrap;
       letter-spacing: 4px;
       line-height: 1;
-      pointer-events: none;
+      pointer-events: none; /* prevent interaction */
       z-index: 150;
     }
 
+    /* Dropdown menu container */
     #menu {
       display: none;
       position: absolute;
@@ -84,6 +88,7 @@
       z-index: 100;
     }
 
+    /* Main menu list */
     #menu > ul {
       list-style: none;
       margin: 0;
@@ -109,6 +114,7 @@
       background-color: #177FB9;
     }
 
+    /* Arrows for dropdown parents */
     .has-dropdown > a::after {
       content: "▼";
       position: absolute;
@@ -119,6 +125,7 @@
       pointer-events: none;
     }
 
+    /* Submenus */
     .dropdown {
       display: none;
       background-color: rgba(23, 127, 185, 0.9);
@@ -136,41 +143,49 @@
       background-color: #0f4c72;
     }
 
+    /* Content styling */
     .content {
-      padding: 40px 20px;
+      padding: 40px;
       text-align: center;
     }
 
     .content-box {
-      background: white;
-      max-width: 700px;
-      margin: 0 auto;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-      text-align: center;
-    }
+  background: white;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  text-align: center;
+}
 
-    .content-box img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
+.content-box img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
 
-    .content-box p {
-      font-size: 1.1em;
-      color: #333;
-    }
+.content-box p {
+  font-size: 1.1em;
+  color: #333;
+}
+
   </style>
 </head>
 <body>
 
   <div class="top-bar">
+    <!-- Menu Button -->
     <button class="menu-btn" id="menuBtn">☰</button>
+
+    <!-- Centered Title -->
     <div class="top-bar-title">GARFIELD</div>
+
+    <!-- Call Button -->
     <a class="call-btn" href="tel:+16477077600">📞</a>
 
+    <!-- Dropdown Menu -->
     <nav id="menu" role="navigation" aria-label="Main Menu">
       <ul>
         <li class="has-dropdown">
@@ -194,28 +209,25 @@
     </nav>
   </div>
 
-  <!-- Default Home Section -->
-  <div class="content" id="default-content">
-    <div class="content-box">
-      <img src="https://res.cloudinary.com/dqqr9udcs/image/upload/v1749969069/1T0delivery_33_mtdk7g.jpg" alt="Garfield Painting Services" />
-      <p>We provide professional painting services for homes, businesses, and roads!</p>
-    </div>
+  <div class="content">
+  <div class="content-box">
+    <img src="https://res.cloudinary.com/dqqr9udcs/image/upload/v1749969069/1T0delivery_33_mtdk7g.jpg" alt="Garfield Painting Services" />
+    <p>We provide professional painting services for homes, businesses, and roads!</p>
+  </div>
+</div>
+
+  <div class="content">
+  <div class="content-box">
+    <img src="https://res.cloudinary.com/dqqr9udcs/image/upload/v1749969069/1T0delivery_33_mtdk7g.jpg" alt="Garfield Painting Services" />
+    <p>We provide professional painting services for homes, businesses, and roads!</p>
+  </div>
   </div>
 
-  <!-- Residential Section -->
-  <div class="content" id="residential-section" style="display: none;">
-    <div class="content-box">
-      <img src="https://res.cloudinary.com/dqqr9udcs/image/upload/v1749969069/residential_sample.jpg" alt="Residential Painting">
-      <p>Our residential painting services cover interior and exterior transformations for your home.</p>
-    </div>
+  <div class="content">
+  <div class="content-box">
+    <img src="https://res.cloudinary.com/dqqr9udcs/image/upload/v1749969069/1T0delivery_33_mtdk7g.jpg" alt="Garfield Painting Services" />
+    <p>We provide professional painting services for homes, businesses, and roads!</p>
   </div>
-
-  <!-- Commercial Section -->
-  <div class="content" id="commercial-section" style="display: none;">
-    <div class="content-box">
-      <img src="https://res.cloudinary.com/dqqr9udcs/image/upload/v1749969069/commercial_sample.jpg" alt="Commercial Painting">
-      <p>We offer reliable commercial painting solutions for businesses of all sizes and types.</p>
-    </div>
   </div>
 
   <script>
@@ -245,12 +257,14 @@
         if (submenu.style.display === 'block') {
           submenu.style.display = 'none';
         } else {
+          // Close any other open submenus
           document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
           submenu.style.display = 'block';
         }
       });
     });
 
+    // Close menu and submenus
     function closeMenu() {
       menu.style.display = 'none';
       document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
@@ -265,28 +279,6 @@
       if (!menu.contains(e.target) && e.target !== menuBtn) {
         closeMenu();
       }
-    });
-
-    // Show section and hide others
-    function showSection(sectionId) {
-      document.getElementById('default-content').style.display = 'none';
-      document.getElementById('residential-section').style.display = 'none';
-      document.getElementById('commercial-section').style.display = 'none';
-
-      const section = document.getElementById(sectionId);
-      section.style.display = 'block';
-      section.scrollIntoView({ behavior: 'smooth' });
-
-      closeMenu();
-    }
-
-    // Click events for menu items
-    document.querySelector('a[data-submenu="residential-submenu"]').addEventListener('click', () => {
-      showSection('residential-section');
-    });
-
-    document.querySelector('a[data-submenu="commercial-submenu"]').addEventListener('click', () => {
-      showSection('commercial-section');
     });
   </script>
 </body>
