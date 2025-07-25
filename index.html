@@ -11,23 +11,14 @@
       background: #f9f9f9;
     }
 
-    header {
-      background-color: #FF1493;
-      color: white;
-      padding: 20px;
-      text-align: center;
-      font-size: 2em;
-    }
-
-    /* Pink bar below header */
+    /* Top bar */
     .top-bar {
       position: relative;
       background-color: #ffc0cb;
-      padding: 50px 0 15px;
-      text-align: center;
+      height: 60px;
     }
 
-    /* Menu button (top left) */
+    /* Menu button (top-left) */
     .menu-btn {
       position: absolute;
       top: 0;
@@ -39,9 +30,10 @@
       border: none;
       font-size: 20px;
       cursor: pointer;
+      height: 100%;
     }
 
-    /* Call button (top right) */
+    /* Call button (top-right) */
     .call-btn {
       position: absolute;
       top: 0;
@@ -54,13 +46,31 @@
       font-size: 16px;
       border: none;
       cursor: pointer;
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Centered title */
+    .top-bar-title {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5em;
+      font-weight: bold;
+      color: black;
     }
 
     /* Dropdown menu */
     #menu {
       display: none;
       position: absolute;
-      top: 50px;
+      top: 60px;
       left: 0;
       background-color: #FF69B4;
       width: 200px;
@@ -108,19 +118,15 @@
 </head>
 <body>
 
-  <header>GARFIELD THE PAINTER</header>
-
   <div class="top-bar">
     <!-- Menu Button -->
     <button class="menu-btn" onclick="toggleMenu()">☰</button>
 
+    <!-- Centered Title -->
+    <div class="top-bar-title">GARFIELD</div>
+
     <!-- Call Button -->
     <a class="call-btn" href="tel:+1234567890">📞 Call</a>
-
-    <!-- Message -->
-    <div style="margin-top: 5px;">
-      <span style="font-size: 1.2em;">Call us today for a free quote!</span>
-    </div>
 
     <!-- Dropdown Menu -->
     <div id="menu">
