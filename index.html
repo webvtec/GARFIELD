@@ -51,7 +51,7 @@
       align-items: center;
     }
 
-    /* Centered title with integrated drips */
+    /* Centered title with static drips */
     .top-bar-title {
       position: absolute;
       top: 0;
@@ -71,17 +71,16 @@
       line-height: 1;
     }
 
-    /* Drips on the text with ::before and ::after */
+    /* Static drips on the text with ::before and ::after (no animation) */
     .top-bar-title::before,
     .top-bar-title::after {
       content: "";
       position: absolute;
-      bottom: 4px; /* slightly above bottom of text */
+      bottom: 4px;
       background: white;
       border-radius: 50% 50% 60% 60% / 60% 60% 90% 90%;
     }
 
-    /* Several drips using multiple pseudo-elements trick */
     .top-bar-title::before {
       left: 12%;
       width: 10px;
@@ -104,7 +103,7 @@
         100px 10px white;
     }
 
-    /* Dropdown menu */
+    /* Dropdown menu container */
     #menu {
       display: none;
       position: absolute;
@@ -117,17 +116,61 @@
       z-index: 100;
     }
 
+    /* Main menu items */
+    #menu > ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    #menu > ul > li {
+      position: relative;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+    }
+
     #menu a {
       display: block;
       padding: 10px 15px;
       color: white;
       text-decoration: none;
+      cursor: pointer;
+      position: relative;
     }
 
     #menu a:hover {
       background-color: #177FB9;
     }
 
+    /* Arrows for items with dropdown - aligned right */
+    .has-dropdown > a::after {
+      content: "▼";
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.7em;
+      pointer-events: none;
+    }
+
+    /* Dropdown placeholders */
+    .dropdown {
+      display: none;
+      background-color: rgba(23, 127, 185, 0.9);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .dropdown li a {
+      padding-left: 30px;
+      font-size: 0.9em;
+    }
+
+    .dropdown li a:hover {
+      background-color: #0f4c72;
+    }
+
+    /* Content styling */
     .content {
       padding: 40px;
       text-align: center;
@@ -147,11 +190,27 @@
     <a class="call-btn" href="tel:+16477077600">📞</a>
 
     <!-- Dropdown Menu -->
-    <div id="menu">
-      <a href="#residential">Residential Painting</a>
-      <a href="#commercial">Commercial Painting</a>
-      <a href="#line">Line Painting</a>
-    </div>
+    <nav id="menu">
+      <ul>
+        <li class="has-dropdown">
+          <a onclick="toggleSubmenu(event, 'residential-submenu')">Residential Painting</a>
+          <ul id="residential-submenu" class="dropdown">
+            <li><a href="#">Placeholder 1</a></li>
+            <li><a href="#">Placeholder 2</a></li>
+          </ul>
+        </li>
+        <li class="has-dropdown">
+          <a onclick="toggleSubmenu(event, 'commercial-submenu')">Commercial Painting</a>
+          <ul id="commercial-submenu" class="dropdown">
+            <li><a href="#">Placeholder 1</a></li>
+            <li><a href="#">Placeholder 2</a></li>
+          </ul>
+        </li>
+        <li>
+          <a href="#line">Line Painting</a>
+        </li>
+      </ul>
+    </nav>
   </div>
 
   <div class="content">
@@ -161,9 +220,31 @@
 
   <script>
     function toggleMenu() {
-      var menu = document.getElementById("menu");
+      const menu = document.getElementById("menu");
       menu.style.display = (menu.style.display === "block") ? "none" : "block";
     }
+
+    function toggleSubmenu(event, submenuId) {
+      event.stopPropagation(); // Prevent menu toggle
+      const submenu = document.getElementById(submenuId);
+      if (submenu.style.display === "block") {
+        submenu.style.display = "none";
+      } else {
+        // Close other submenus
+        document.querySelectorAll("#menu .dropdown").forEach(d => d.style.display = "none");
+        submenu.style.display = "block";
+      }
+    }
+
+    // Close menu if clicking outside
+    document.addEventListener('click', function(event) {
+      const menu = document.getElementById("menu");
+      if (!menu.contains(event.target) && menu.style.display === "block") {
+        menu.style.display = "none";
+        // Close all submenus
+        document.querySelectorAll("#menu .dropdown").forEach(d => d.style.display = "none");
+      }
+    });
   </script>
 
 </body>
