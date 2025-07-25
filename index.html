@@ -148,6 +148,29 @@
       padding: 40px;
       text-align: center;
     }
+
+    .content-box {
+  background: white;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.content-box img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.content-box p {
+  font-size: 1.1em;
+  color: #333;
+}
+
   </style>
 </head>
 <body>
@@ -187,8 +210,10 @@
   </div>
 
   <div class="content">
-  <img src="https://res.cloudinary.com/dqqr9udcs/image/upload/v1749969069/1T0delivery_33_mtdk7g.jpg" alt="Garfield Painting Services" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
-  <p style="margin-top: 20px;">We provide professional painting services for homes, businesses, and roads!</p>
+  <div class="content-box">
+    <img src="https://res.cloudinary.com/dqqr9udcs/image/upload/v1749969069/1T0delivery_33_mtdk7g.jpg" alt="Garfield Painting Services" />
+    <p>We provide professional painting services for homes, businesses, and roads!</p>
+  </div>
 </div>
 
   <script>
