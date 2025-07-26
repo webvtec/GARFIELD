@@ -14,7 +14,7 @@
 <body>
 
   <!-- Login Section -->
-  <div id="login-section" class="hidden">
+  <div id="login-section">
     <h2>Admin Login</h2>
     <input type="email" id="email" placeholder="Email" />
     <input type="password" id="password" placeholder="Password" />
@@ -39,70 +39,58 @@
   </div>
 
   <script>
-    // Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyBtndRroVa279cpMzQlIiphU1W9Uw_Yg6U",
-      authDomain: "kravin-delivery.firebaseapp.com",
-      projectId: "kravin-delivery",
-      storageBucket: "kravin-delivery.appspot.com",
-      messagingSenderId: "862159900289",
-      appId: "1:862159900289:web:18797ef8343e6329cb0780"
-    };
+    // Wait for DOM to be fully ready
+    document.addEventListener("DOMContentLoaded", () => {
+      const firebaseConfig = {
+        apiKey: "AIzaSyBtndRroVa279cpMzQlIiphU1W9Uw_Yg6U",
+        authDomain: "kravin-delivery.firebaseapp.com",
+        projectId: "kravin-delivery",
+        storageBucket: "kravin-delivery.appspot.com",
+        messagingSenderId: "862159900289",
+        appId: "1:862159900289:web:18797ef8343e6329cb0780"
+      };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
 
-    const FIXED_EMAIL = "carlanviroberts@gmail.com";
-    const FIXED_PASSWORD = "@Carlanvi321";
+      const FIXED_EMAIL = "carlanviroberts@gmail.com";
+      const FIXED_PASSWORD = "@Carlanvi321";
 
-    // ✅ On Load: Check Login Memory
-    window.onload = () => {
-      if (localStorage.getItem("adminLoggedIn") === "true") {
-        showAdmin();
-      } else {
-        document.getElementById("login-section").classList.remove("hidden");
-      }
-    };
+      window.manualLogin = () => {
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const errorEl = document.getElementById("login-error");
 
-    function showAdmin() {
-      document.getElementById("login-section").classList.add("hidden");
-      document.getElementById("admin-section").classList.remove("hidden");
-    }
+        if (email === FIXED_EMAIL && password === FIXED_PASSWORD) {
+          document.getElementById("login-section").classList.add("hidden");
+          document.getElementById("admin-section").classList.remove("hidden");
+          errorEl.textContent = "";
+        } else {
+          errorEl.textContent = "Invalid email or password.";
+        }
+      };
 
-    function manualLogin() {
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const errorEl = document.getElementById("login-error");
+      window.saveSection = async () => {
+        const sectionId = document.getElementById("section-select").value;
+        const description = document.getElementById("description").value.trim();
+        const imageURL = document.getElementById("image-url").value.trim();
+        const status = document.getElementById("status");
 
-      if (email === FIXED_EMAIL && password === FIXED_PASSWORD) {
-        localStorage.setItem("adminLoggedIn", "true");
-        showAdmin();
-        errorEl.textContent = "";
-      } else {
-        errorEl.textContent = "Invalid email or password.";
-      }
-    }
+        status.textContent = "Saving...";
 
-    async function saveSection() {
-      const sectionId = document.getElementById("section-select").value;
-      const description = document.getElementById("description").value.trim();
-      const imageURL = document.getElementById("image-url").value.trim();
-      const status = document.getElementById("status");
+        try {
+          const data = { description };
+          if (imageURL) data.image = imageURL;
 
-      status.textContent = "Saving...";
+          await db.collection("sections").doc(sectionId).set(data, { merge: true });
 
-      try {
-        const data = { description };
-        if (imageURL) data.image = imageURL;
-
-        await db.collection("sections").doc(sectionId).set(data, { merge: true });
-
-        status.textContent = "Section saved successfully!";
-      } catch (error) {
-        console.error(error);
-        status.textContent = "Failed to save section.";
-      }
-    }
+          status.textContent = "Section saved successfully!";
+        } catch (error) {
+          console.error(error);
+          status.textContent = "Failed to save section.";
+        }
+      };
+    });
   </script>
 </body>
 </html>
