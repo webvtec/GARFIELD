@@ -2,177 +2,117 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Dashboard - Section Content</title>
+  <title>Admin Dashboard</title>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .form-container {
-      max-width: 600px;
-      margin: 0 auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-
-    select, input, textarea, button {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      font-size: 16px;
-    }
-
-    button {
-      background: #333;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-
-    img.preview {
-      width: 100%;
-      max-height: 250px;
-      object-fit: cover;
-      margin-bottom: 15px;
-      border-radius: 8px;
-    }
-
-    .section-preview {
-      margin-top: 30px;
-    }
+    body { font-family: Arial; padding: 40px; background: #f2f2f2; }
+    input, textarea, select, button { margin: 10px 0; padding: 10px; width: 100%; max-width: 400px; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
 
-  <h1>Admin Dashboard - Section Content Control</h1>
+  <div id="login-section">
+    <h2>Admin Login</h2>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+    <p id="login-error" style="color:red;"></p>
+  </div>
 
-  <div class="form-container">
-    <label for="section-select">Choose Section:</label>
+  <div id="admin-section" class="hidden">
+    <h2>Update Section</h2>
     <select id="section-select">
-      <option value="res-exterior">Residential Exterior</option>
-      <option value="res-interior">Residential Interior</option>
-      <option value="com-exterior">Commercial Exterior</option>
-      <option value="com-interior">Commercial Interior</option>
+      <option value="default-content">Default Welcome</option>
+      <option value="res-exterior">Residential - Exterior</option>
+      <option value="res-interior">Residential - Interior</option>
+      <option value="com-exterior">Commercial - Exterior</option>
+      <option value="com-interior">Commercial - Interior</option>
     </select>
-
-    <label for="image-url">Image URL:</label>
-    <input type="text" id="image-url" placeholder="Paste image link here" oninput="updatePreview()" />
-
-    <img id="image-preview" class="preview" src="" alt="Image preview" style="display:none;" />
-
-    <label for="description">Section Description:</label>
-    <textarea id="description" rows="4" placeholder="Enter section description..."></textarea>
-
-    <button onclick="saveContent()">Save</button>
+    <textarea id="description" placeholder="Enter description here..."></textarea>
+    <input type="file" id="imageUpload" accept="image/*" />
+    <button onclick="saveSection()">Save Section</button>
+    <p id="status" style="color: green;"></p>
   </div>
-
-  <div class="section-preview">
-    <h3 style="text-align: center;">Live Preview</h3>
-    <div id="preview-content" class="form-container"></div>
-  </div>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
 
   <script>
-    // Replace this with your Firebase project config
+    // Firebase Config
     const firebaseConfig = {
-  apiKey: "AIzaSyBtndRroVa279cpMzQlIiphU1W9Uw_Yg6U",
-  authDomain: "kravin-delivery.firebaseapp.com",
-  projectId: "kravin-delivery",
-  storageBucket: "kravin-delivery.firebasestorage.app",
-  messagingSenderId: "862159900289",
-  appId: "1:862159900289:web:18797ef8343e6329cb0780"
-};
+      apiKey: "AIzaSyBtndRroVa279cpMzQlIiphU1W9Uw_Yg6U",
+      authDomain: "kravin-delivery.firebaseapp.com",
+      projectId: "kravin-delivery",
+      storageBucket: "kravin-delivery.appspot.com",
+      messagingSenderId: "862159900289",
+      appId: "1:862159900289:web:18797ef8343e6329cb0780"
+    };
 
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore(app);
-  </script>
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
 
-  <script>
-    const sectionSelect = document.getElementById('section-select');
-    const imageInput = document.getElementById('image-url');
-    const descInput = document.getElementById('description');
-    const imgPreview = document.getElementById('image-preview');
-    const previewBox = document.getElementById('preview-content');
+    const allowedEmail = "carlanviroberts@gmail.com";
+    const allowedPassword = "27728ee";
 
-    async function loadSectionData() {
-      const selected = sectionSelect.value;
-      const docRef = db.collection('sections').doc(selected);
-      const doc = await docRef.get();
+    async function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
 
-      if (doc.exists) {
-        const data = doc.data();
-        imageInput.value = data.image || '';
-        descInput.value = data.description || '';
+      if (email === allowedEmail && password === allowedPassword) {
+        try {
+          await auth.signInWithEmailAndPassword(email, password);
+          document.getElementById("login-section").classList.add("hidden");
+          document.getElementById("admin-section").classList.remove("hidden");
+        } catch (error) {
+          if (error.code === "auth/user-not-found") {
+            // If no user exists, create one
+            try {
+              await auth.createUserWithEmailAndPassword(email, password);
+              document.getElementById("login-section").classList.add("hidden");
+              document.getElementById("admin-section").classList.remove("hidden");
+            } catch (err) {
+              document.getElementById("login-error").innerText = err.message;
+            }
+          } else {
+            document.getElementById("login-error").innerText = error.message;
+          }
+        }
       } else {
-        imageInput.value = '';
-        descInput.value = '';
-      }
-
-      updatePreview();
-    }
-
-    function updatePreview() {
-      const url = imageInput.value;
-      if (url) {
-        imgPreview.src = url;
-        imgPreview.style.display = 'block';
-      } else {
-        imgPreview.style.display = 'none';
+        document.getElementById("login-error").innerText = "Invalid email or password.";
       }
     }
 
-    async function saveContent() {
-      const selected = sectionSelect.value;
-      const data = {
-        image: imageInput.value.trim(),
-        description: descInput.value.trim()
-      };
+    async function saveSection() {
+      const sectionId = document.getElementById("section-select").value;
+      const description = document.getElementById("description").value;
+      const file = document.getElementById("imageUpload").files[0];
+      const status = document.getElementById("status");
 
-      await db.collection('sections').doc(selected).set(data);
-      alert("Content saved for: " + formatSectionName(selected));
-      renderLivePreview();
+      status.textContent = "Saving...";
+
+      try {
+        let imageURL = "";
+
+        if (file) {
+          const storageRef = storage.ref().child(`sections/${sectionId}/${file.name}`);
+          await storageRef.put(file);
+          imageURL = await storageRef.getDownloadURL();
+        }
+
+        const data = { description };
+        if (imageURL) data.image = imageURL;
+
+        await db.collection("sections").doc(sectionId).set(data, { merge: true });
+
+        status.textContent = "Section saved successfully!";
+      } catch (error) {
+        console.error(error);
+        status.textContent = "Failed to save section.";
+      }
     }
-
-    async function renderLivePreview() {
-      previewBox.innerHTML = '';
-      const snapshot = await db.collection('sections').get();
-
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const section = document.createElement('div');
-        section.style.marginBottom = '30px';
-        section.innerHTML = `
-          <h3>${formatSectionName(doc.id)}</h3>
-          ${data.image ? `<img src="${data.image}" class="preview" alt="Image for ${doc.id}" />` : ''}
-          <p>${data.description}</p>
-        `;
-        previewBox.appendChild(section);
-      });
-    }
-
-    function formatSectionName(key) {
-      return key.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase());
-    }
-
-    sectionSelect.addEventListener('change', loadSectionData);
-    window.addEventListener('DOMContentLoaded', () => {
-      loadSectionData();
-      renderLivePreview();
-    });
   </script>
 </body>
 </html>
