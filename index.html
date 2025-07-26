@@ -160,7 +160,6 @@
       color: #333;
     }
   </style>
-
 </head>
 <body>
 
@@ -190,15 +189,8 @@
     </nav>
   </div>
 
-  <!-- Default welcome section -->
-  <div class="content" id="default-content">
-    <div class="content-box">
-      <img src="https://res.cloudinary.com/dqqr9udcs/image/upload/v1749969069/1T0delivery_33_mtdk7g.jpg" alt="Garfield Painting Services" />
-      <p>We provide professional painting services for homes, businesses, and roads!</p>
-    </div>
-  </div>
-
   <!-- Dynamic Sections (initially empty) -->
+  <div class="content" id="default-content"><div class="content-box"></div></div>
   <div class="content" id="res-exterior" style="display: none;"><div class="content-box"></div></div>
   <div class="content" id="res-interior" style="display: none;"><div class="content-box"></div></div>
   <div class="content" id="com-exterior" style="display: none;"><div class="content-box"></div></div>
@@ -208,7 +200,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
 
-  <!-- Firebase Setup (REPLACE with your config) -->
+  <!-- Firebase Setup (REPLACE with your actual config) -->
   <script>
     const firebaseConfig = {
       apiKey: "YOUR_API_KEY",
@@ -222,7 +214,7 @@
     const db = firebase.firestore(app);
   </script>
 
-  <!-- UI + Dynamic Loader Script -->
+  <!-- Main JavaScript -->
   <script>
     const menuBtn = document.getElementById('menuBtn');
     const menu = document.getElementById('menu');
@@ -268,7 +260,7 @@
       if (doc.exists) {
         const data = doc.data();
         box.innerHTML = `
-          <h2>${formatTitle(sectionId)}</h2>
+          ${sectionId !== 'default-content' ? `<h2>${formatTitle(sectionId)}</h2>` : ''}
           ${data.image ? `<img src="${data.image}" alt="${formatTitle(sectionId)}" />` : ''}
           <p>${data.description || ''}</p>
         `;
@@ -280,6 +272,11 @@
     function formatTitle(id) {
       return id.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase());
     }
+
+    // Load welcome section on first visit
+    window.addEventListener('DOMContentLoaded', () => {
+      loadSectionContent('default-content');
+    });
   </script>
 </body>
 </html>
