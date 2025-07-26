@@ -160,53 +160,69 @@
       color: #333;
     }
 
-    /* Modal styles */
+    /* Login modal styles */
     #login-modal {
-      display: none; /* Hidden by default */
+      display: none;
       position: fixed;
       z-index: 500;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.6);
+      left: 0; top: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     #login-modal-content {
-      background-color: #fff;
-      margin: 10% auto;
-      padding: 30px;
+      background: white;
+      padding: 30px 40px;
       border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
       width: 320px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      max-width: 90%;
       text-align: center;
+      font-family: Arial, sans-serif;
+    }
+
+    #login-modal-content h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-weight: 600;
+      font-size: 1.5em;
     }
 
     #login-modal-content input {
       width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      font-size: 16px;
-      border-radius: 6px;
+      padding: 10px 12px;
+      margin-bottom: 15px;
+      font-size: 1em;
       border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
     }
 
     #login-modal-content button {
-      width: 100%;
       background-color: #177FB9;
-      color: white;
       border: none;
-      padding: 12px;
-      font-size: 16px;
-      cursor: pointer;
+      color: white;
+      padding: 12px 0;
+      width: 100%;
+      font-size: 1.1em;
       border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #login-modal-content button:hover {
+      background-color: #125d8a;
     }
 
     #login-error {
       color: red;
-      min-height: 20px;
       margin-top: 10px;
+      min-height: 20px;
+      font-weight: 600;
     }
   </style>
 </head>
@@ -234,7 +250,7 @@
           </ul>
         </li>
         <li><a href="#line">Line Painting</a></li>
-        <!-- Admin Dashboard button triggers login -->
+        <!-- Admin Dashboard button with id for JS -->
         <li><a href="#" id="admin-dashboard-btn">Admin Dashboard</a></li>
       </ul>
     </nav>
@@ -247,20 +263,9 @@
   <div class="content" id="com-exterior" style="display: none;"><div class="content-box"></div></div>
   <div class="content" id="com-interior" style="display: none;"><div class="content-box"></div></div>
 
-  <!-- Login Modal -->
-  <div id="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
-    <div id="login-modal-content">
-      <h2 id="login-modal-title">Admin Login</h2>
-      <input type="email" id="login-email" placeholder="Email" required />
-      <input type="password" id="login-password" placeholder="Password" required />
-      <button id="login-submit-btn">Log In</button>
-      <div id="login-error"></div>
-    </div>
-  </div>
-
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
 
   <!-- Firebase Setup -->
   <script>
@@ -272,11 +277,11 @@
       messagingSenderId: "862159900289",
       appId: "1:862159900289:web:18797ef8343e6329cb0780"
     };
-
     const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+    const db = firebase.firestore(app);
   </script>
 
+  <!-- Main JavaScript -->
   <script>
     const menuBtn = document.getElementById('menuBtn');
     const menu = document.getElementById('menu');
@@ -316,7 +321,6 @@
 
     async function loadSectionContent(sectionId) {
       const box = document.querySelector(`#${sectionId} .content-box`);
-      const db = firebase.firestore();
       const docRef = db.collection('sections').doc(sectionId);
       const doc = await docRef.get();
 
@@ -340,8 +344,20 @@
     window.addEventListener('DOMContentLoaded', () => {
       loadSectionContent('default-content');
     });
+  </script>
 
-    // ADMIN DASHBOARD LOGIN FLOW
+  <!-- Login Modal -->
+  <div id="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
+    <div id="login-modal-content">
+      <h2 id="login-modal-title">Admin Login</h2>
+      <input type="email" id="login-email" placeholder="Email" required />
+      <input type="password" id="login-password" placeholder="Password" required />
+      <button id="login-submit-btn">Log In</button>
+      <div id="login-error" role="alert" aria-live="assertive"></div>
+    </div>
+  </div>
+
+  <script>
     const adminDashboardBtn = document.getElementById('admin-dashboard-btn');
     const loginModal = document.getElementById('login-modal');
     const loginSubmitBtn = document.getElementById('login-submit-btn');
@@ -349,38 +365,56 @@
     const loginPassword = document.getElementById('login-password');
     const loginError = document.getElementById('login-error');
 
+    // Fixed credentials
+    const FIXED_EMAIL = "carlanviroberts@gmail.com";
+    const FIXED_PASSWORD = "@Carlanvi321";
+
     adminDashboardBtn.addEventListener('click', e => {
       e.preventDefault();
       loginError.textContent = '';
       loginEmail.value = '';
       loginPassword.value = '';
-      loginModal.style.display = 'block';
+      loginModal.style.display = 'flex';
+      loginEmail.focus();
     });
 
-    loginSubmitBtn.addEventListener('click', async () => {
+    loginSubmitBtn.addEventListener('click', () => {
       const email = loginEmail.value.trim();
       const password = loginPassword.value.trim();
       loginError.textContent = '';
+
       if (!email || !password) {
         loginError.textContent = 'Please enter both email and password.';
         return;
       }
-      try {
-        await auth.signInWithEmailAndPassword(email, password);
+
+      if (email === FIXED_EMAIL && password === FIXED_PASSWORD) {
         loginModal.style.display = 'none';
-        // Redirect to admin dashboard after successful login
         window.location.href = 'admindashboard.html';
-      } catch (error) {
-        loginError.textContent = error.message;
+      } else {
+        loginError.textContent = 'Invalid email or password.';
       }
     });
 
-    // Close modal if user clicks outside content
+    // Close modal if clicking outside content
     window.addEventListener('click', (event) => {
       if (event.target === loginModal) {
         loginModal.style.display = 'none';
       }
     });
+
+    // Optional: Enter key submits login form
+    loginPassword.addEventListener('keyup', (e) => {
+      if (e.key === 'Enter') {
+        loginSubmitBtn.click();
+      }
+    });
+    loginEmail.addEventListener('keyup', (e) => {
+      if (e.key === 'Enter') {
+        loginSubmitBtn.click();
+      }
+    });
   </script>
+
 </body>
 </html>
