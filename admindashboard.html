@@ -10,34 +10,38 @@
     input, textarea, select, button { margin: 10px 0; padding: 10px; width: 100%; max-width: 400px; }
     #login-section, #admin-section { max-width: 500px; margin: auto; }
     .hidden { display: none; }
+    #status { min-height: 20px; }
   </style>
 </head>
 <body>
 
   <!-- Login Section -->
-  <div id="login-section" class="hidden">
+  <div id="login-section" class="hidden" role="region" aria-label="Admin login form">
     <h2>Admin Login</h2>
-    <input type="email" id="email" placeholder="Email" />
-    <input type="password" id="password" placeholder="Password" />
-    <button onclick="manualLogin()">Login</button>
-    <p id="login-error" style="color:red;"></p>
+    <input type="email" id="email" placeholder="Email" aria-label="Email" autocomplete="username" />
+    <input type="password" id="password" placeholder="Password" aria-label="Password" autocomplete="current-password" />
+    <button onclick="manualLogin()" aria-label="Submit login">Login</button>
+    <p id="login-error" style="color:red;" role="alert" aria-live="assertive"></p>
   </div>
 
   <!-- Admin Panel -->
-  <div id="admin-section" class="hidden">
+  <div id="admin-section" class="hidden" role="region" aria-label="Admin panel">
     <h2>Update Section</h2>
-    <select id="section-select">
+    <label for="section-select">Select Section:</label>
+    <select id="section-select" aria-required="true">
       <option value="default-content">Default Welcome</option>
       <option value="res-exterior">Residential - Exterior</option>
       <option value="res-interior">Residential - Interior</option>
       <option value="com-exterior">Commercial - Exterior</option>
       <option value="com-interior">Commercial - Interior</option>
     </select>
-    <textarea id="description" placeholder="Enter description here..."></textarea>
+    <label for="description">Description:</label>
+    <textarea id="description" placeholder="Enter description here..." aria-required="true"></textarea>
+    <label for="image-url">Image URL (optional):</label>
     <input type="url" id="image-url" placeholder="Paste image URL here (optional)" />
-    <button onclick="saveSection()">Save Section</button>
-    <p id="status" style="color: green;"></p>
-    <button onclick="logout()" style="margin-top:20px; background:#d9534f; color:#fff;">Logout</button>
+    <button onclick="saveSection()" aria-label="Save section data">Save Section</button>
+    <p id="status" style="color: green;" role="status" aria-live="polite"></p>
+    <button onclick="logout()" style="margin-top:20px; background:#d9534f; color:#fff;" aria-label="Logout">Logout</button>
   </div>
 
   <script>
@@ -69,11 +73,24 @@
     function showAdmin() {
       document.getElementById('login-section').classList.add('hidden');
       document.getElementById('admin-section').classList.remove('hidden');
+      clearStatusAndErrors();
     }
 
     function showLogin() {
       document.getElementById('login-section').classList.remove('hidden');
       document.getElementById('admin-section').classList.add('hidden');
+      clearStatusAndErrors();
+      clearLoginInputs();
+    }
+
+    function clearStatusAndErrors() {
+      document.getElementById('login-error').textContent = '';
+      document.getElementById('status').textContent = '';
+    }
+
+    function clearLoginInputs() {
+      document.getElementById('email').value = '';
+      document.getElementById('password').value = '';
     }
 
     function manualLogin() {
@@ -96,6 +113,13 @@
       const imageURL = document.getElementById('image-url').value.trim();
       const status = document.getElementById('status');
 
+      if (!description) {
+        status.style.color = 'red';
+        status.textContent = 'Description cannot be empty.';
+        return;
+      }
+
+      status.style.color = 'black';
       status.textContent = 'Saving...';
 
       try {
@@ -104,9 +128,11 @@
 
         await db.collection('sections').doc(sectionId).set(data, { merge: true });
 
+        status.style.color = 'green';
         status.textContent = 'Section saved successfully!';
       } catch (error) {
-        console.error(error);
+        console.error('Save failed:', error);
+        status.style.color = 'red';
         status.textContent = 'Failed to save section.';
       }
     }
