@@ -173,15 +173,15 @@
         <li class="has-dropdown">
           <a href="#" class="dropdown-toggle" data-submenu="residential-submenu">Residential Painting</a>
           <ul id="residential-submenu" class="dropdown" aria-label="Residential submenu">
-            <li><a href="#" onclick="showSection('exterior')">EXTERIOR PAINTING</a></li>
-            <li><a href="#" onclick="showSection('interior')">INTERIOR PAINTING</a></li>
+            <li><a href="#" onclick="showSection('res-exterior')">EXTERIOR PAINTING</a></li>
+            <li><a href="#" onclick="showSection('res-interior')">INTERIOR PAINTING</a></li>
           </ul>
         </li>
         <li class="has-dropdown">
           <a href="#" class="dropdown-toggle" data-submenu="commercial-submenu">Commercial Painting</a>
           <ul id="commercial-submenu" class="dropdown" aria-label="Commercial submenu">
-            <li><a href="#">EXTERIOR PAINTING</a></li>
-            <li><a href="#">INTERIOR PAINTING</a></li>
+            <li><a href="#" onclick="showSection('com-exterior')">EXTERIOR PAINTING</a></li>
+            <li><a href="#" onclick="showSection('com-interior')">INTERIOR PAINTING</a></li>
           </ul>
         </li>
         <li>
@@ -198,21 +198,37 @@
     </div>
   </div>
 
-  <!-- Exterior Painting Section -->
-  <div class="content" id="exterior" style="display: none;">
+  <!-- RESIDENTIAL -->
+  <div class="content" id="res-exterior" style="display: none;">
     <div class="content-box">
-      <h2>Exterior Painting</h2>
-      <img src="https://via.placeholder.com/700x400?text=Exterior+Painting" alt="Exterior Painting">
-      <p>We specialize in high-quality exterior painting for homes and buildings. Our team uses durable, weather-resistant paint to make your property look great and last longer.</p>
+      <h2>Residential Exterior Painting</h2>
+      <img src="https://via.placeholder.com/700x400?text=Residential+Exterior" alt="Residential Exterior Painting">
+      <p>We provide professional exterior painting for houses with high-quality finishes that protect your home from the elements.</p>
     </div>
   </div>
 
-  <!-- Interior Painting Section -->
-  <div class="content" id="interior" style="display: none;">
+  <div class="content" id="res-interior" style="display: none;">
     <div class="content-box">
-      <h2>Interior Painting</h2>
-      <img src="https://via.placeholder.com/700x400?text=Interior+Painting" alt="Interior Painting">
-      <p>Transform your indoor spaces with professional interior painting. We offer neat, clean finishes and a variety of colors to match your vision.</p>
+      <h2>Residential Interior Painting</h2>
+      <img src="https://via.placeholder.com/700x400?text=Residential+Interior" alt="Residential Interior Painting">
+      <p>Update your living space with fresh, detailed interior paint that reflects your style and enhances comfort.</p>
+    </div>
+  </div>
+
+  <!-- COMMERCIAL -->
+  <div class="content" id="com-exterior" style="display: none;">
+    <div class="content-box">
+      <h2>Commercial Exterior Painting</h2>
+      <img src="https://via.placeholder.com/700x400?text=Commercial+Exterior" alt="Commercial Exterior Painting">
+      <p>Make a strong first impression with clean, durable exterior paint on your commercial building. We work efficiently with minimal disruption.</p>
+    </div>
+  </div>
+
+  <div class="content" id="com-interior" style="display: none;">
+    <div class="content-box">
+      <h2>Commercial Interior Painting</h2>
+      <img src="https://via.placeholder.com/700x400?text=Commercial+Interior" alt="Commercial Interior Painting">
+      <p>We deliver crisp, professional interior paint jobs for offices, shops, and business interiors that reflect your brand.</p>
     </div>
   </div>
 
@@ -244,8 +260,12 @@
     });
 
     function showSection(sectionId) {
-      const sections = ['default-content', 'exterior', 'interior'];
-      sections.forEach(id => {
+      const allSections = [
+        'default-content',
+        'res-exterior', 'res-interior',
+        'com-exterior', 'com-interior'
+      ];
+      allSections.forEach(id => {
         document.getElementById(id).style.display = (id === sectionId) ? 'block' : 'none';
       });
       document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
