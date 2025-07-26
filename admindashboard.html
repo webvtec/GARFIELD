@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard - Section Content</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .form-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    select, input, textarea, button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+
+    button {
+      background: #333;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    img.preview {
+      width: 100%;
+      max-height: 250px;
+      object-fit: cover;
+      margin-bottom: 15px;
+      border-radius: 8px;
+    }
+
+    .section-preview {
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Admin Dashboard - Section Content Control</h1>
+
+  <div class="form-container">
+    <label for="section-select">Choose Section:</label>
+    <select id="section-select">
+      <option value="res-exterior">Residential Exterior</option>
+      <option value="res-interior">Residential Interior</option>
+      <option value="com-exterior">Commercial Exterior</option>
+      <option value="com-interior">Commercial Interior</option>
+    </select>
+
+    <label for="image-url">Image URL:</label>
+    <input type="text" id="image-url" placeholder="Paste image link here" oninput="updatePreview()" />
+
+    <img id="image-preview" class="preview" src="" alt="Image preview" style="display:none;" />
+
+    <label for="description">Section Description:</label>
+    <textarea id="description" rows="4" placeholder="Enter section description..."></textarea>
+
+    <button onclick="saveContent()">Save</button>
+  </div>
+
+  <div class="section-preview">
+    <h3 style="text-align: center;">Live Preview</h3>
+    <div id="preview-content" class="form-container"></div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+
+  <script>
+    // Replace this with your Firebase project config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore(app);
+  </script>
+
+  <script>
+    const sectionSelect = document.getElementById('section-select');
+    const imageInput = document.getElementById('image-url');
+    const descInput = document.getElementById('description');
+    const imgPreview = document.getElementById('image-preview');
+    const previewBox = document.getElementById('preview-content');
+
+    async function loadSectionData() {
+      const selected = sectionSelect.value;
+      const docRef = db.collection('sections').doc(selected);
+      const doc = await docRef.get();
+
+      if (doc.exists) {
+        const data = doc.data();
+        imageInput.value = data.image || '';
+        descInput.value = data.description || '';
+      } else {
+        imageInput.value = '';
+        descInput.value = '';
+      }
+
+      updatePreview();
+    }
+
+    function updatePreview() {
+      const url = imageInput.value;
+      if (url) {
+        imgPreview.src = url;
+        imgPreview.style.display = 'block';
+      } else {
+        imgPreview.style.display = 'none';
+      }
+    }
+
+    async function saveContent() {
+      const selected = sectionSelect.value;
+      const data = {
+        image: imageInput.value.trim(),
+        description: descInput.value.trim()
+      };
+
+      await db.collection('sections').doc(selected).set(data);
+      alert("Content saved for: " + formatSectionName(selected));
+      renderLivePreview();
+    }
+
+    async function renderLivePreview() {
+      previewBox.innerHTML = '';
+      const snapshot = await db.collection('sections').get();
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const section = document.createElement('div');
+        section.style.marginBottom = '30px';
+        section.innerHTML = `
+          <h3>${formatSectionName(doc.id)}</h3>
+          ${data.image ? `<img src="${data.image}" class="preview" alt="Image for ${doc.id}" />` : ''}
+          <p>${data.description}</p>
+        `;
+        previewBox.appendChild(section);
+      });
+    }
+
+    function formatSectionName(key) {
+      return key.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    sectionSelect.addEventListener('change', loadSectionData);
+    window.addEventListener('DOMContentLoaded', () => {
+      loadSectionData();
+      renderLivePreview();
+    });
+  </script>
+</body>
+</html>
