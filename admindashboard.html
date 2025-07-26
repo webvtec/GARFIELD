@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <title>Admin Dashboard</title>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js"></script>
   <style>
@@ -15,14 +14,16 @@
 </head>
 <body>
 
+  <!-- Login Section -->
   <div id="login-section">
     <h2>Admin Login</h2>
     <input type="email" id="email" placeholder="Email" />
     <input type="password" id="password" placeholder="Password" />
-    <button onclick="login()">Login</button>
+    <button onclick="manualLogin()">Login</button>
     <p id="login-error" style="color:red;"></p>
   </div>
 
+  <!-- Admin Panel -->
   <div id="admin-section" class="hidden">
     <h2>Update Section</h2>
     <select id="section-select">
@@ -50,38 +51,24 @@
     };
 
     firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
     const db = firebase.firestore();
     const storage = firebase.storage();
 
-    const allowedEmail = "carlanviroberts@gmail.com";
-    const allowedPassword = "27728ee";
+    // Fixed Login - same as index.html
+    const FIXED_EMAIL = "carlanviroberts@gmail.com";
+    const FIXED_PASSWORD = "@Carlanvi321";
 
-    async function login() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+    function manualLogin() {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const errorEl = document.getElementById("login-error");
 
-      if (email === allowedEmail && password === allowedPassword) {
-        try {
-          await auth.signInWithEmailAndPassword(email, password);
-          document.getElementById("login-section").classList.add("hidden");
-          document.getElementById("admin-section").classList.remove("hidden");
-        } catch (error) {
-          if (error.code === "auth/user-not-found") {
-            // If no user exists, create one
-            try {
-              await auth.createUserWithEmailAndPassword(email, password);
-              document.getElementById("login-section").classList.add("hidden");
-              document.getElementById("admin-section").classList.remove("hidden");
-            } catch (err) {
-              document.getElementById("login-error").innerText = err.message;
-            }
-          } else {
-            document.getElementById("login-error").innerText = error.message;
-          }
-        }
+      if (email === FIXED_EMAIL && password === FIXED_PASSWORD) {
+        document.getElementById("login-section").classList.add("hidden");
+        document.getElementById("admin-section").classList.remove("hidden");
+        errorEl.textContent = "";
       } else {
-        document.getElementById("login-error").innerText = "Invalid email or password.";
+        errorEl.textContent = "Invalid email or password.";
       }
     }
 
@@ -109,10 +96,11 @@
 
         status.textContent = "Section saved successfully!";
       } catch (error) {
-        console.error(error);
+        console.error("Save error:", error);
         status.textContent = "Failed to save section.";
       }
     }
   </script>
+
 </body>
 </html>
