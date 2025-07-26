@@ -159,6 +159,55 @@
       font-size: 1.1em;
       color: #333;
     }
+
+    /* Modal styles */
+    #login-modal {
+      display: none; /* Hidden by default */
+      position: fixed;
+      z-index: 500;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.6);
+    }
+
+    #login-modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 30px;
+      border-radius: 12px;
+      width: 320px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+
+    #login-modal-content input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    #login-modal-content button {
+      width: 100%;
+      background-color: #177FB9;
+      color: white;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    #login-error {
+      color: red;
+      min-height: 20px;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -169,26 +218,26 @@
     <a class="call-btn" href="tel:+16477077600">📞</a>
 
     <nav id="menu" role="navigation" aria-label="Main Menu">
-  <ul>
-    <li class="has-dropdown">
-      <a href="#" class="dropdown-toggle" data-submenu="residential-submenu">Residential Painting</a>
-      <ul id="residential-submenu" class="dropdown" aria-label="Residential submenu">
-        <li><a href="#" onclick="showSection('res-exterior')">EXTERIOR PAINTING</a></li>
-        <li><a href="#" onclick="showSection('res-interior')">INTERIOR PAINTING</a></li>
+      <ul>
+        <li class="has-dropdown">
+          <a href="#" class="dropdown-toggle" data-submenu="residential-submenu">Residential Painting</a>
+          <ul id="residential-submenu" class="dropdown" aria-label="Residential submenu">
+            <li><a href="#" onclick="showSection('res-exterior')">EXTERIOR PAINTING</a></li>
+            <li><a href="#" onclick="showSection('res-interior')">INTERIOR PAINTING</a></li>
+          </ul>
+        </li>
+        <li class="has-dropdown">
+          <a href="#" class="dropdown-toggle" data-submenu="commercial-submenu">Commercial Painting</a>
+          <ul id="commercial-submenu" class="dropdown" aria-label="Commercial submenu">
+            <li><a href="#" onclick="showSection('com-exterior')">EXTERIOR PAINTING</a></li>
+            <li><a href="#" onclick="showSection('com-interior')">INTERIOR PAINTING</a></li>
+          </ul>
+        </li>
+        <li><a href="#line">Line Painting</a></li>
+        <!-- Admin Dashboard button triggers login -->
+        <li><a href="#" id="admin-dashboard-btn">Admin Dashboard</a></li>
       </ul>
-    </li>
-    <li class="has-dropdown">
-      <a href="#" class="dropdown-toggle" data-submenu="commercial-submenu">Commercial Painting</a>
-      <ul id="commercial-submenu" class="dropdown" aria-label="Commercial submenu">
-        <li><a href="#" onclick="showSection('com-exterior')">EXTERIOR PAINTING</a></li>
-        <li><a href="#" onclick="showSection('com-interior')">INTERIOR PAINTING</a></li>
-      </ul>
-    </li>
-    <li><a href="#line">Line Painting</a></li>
-    <!-- New Admin Dashboard button -->
-    <li><a href="admindashboard.html">Admin Dashboard</a></li>
-  </ul>
-</nav>
+    </nav>
   </div>
 
   <!-- Dynamic Sections (initially empty) -->
@@ -198,25 +247,36 @@
   <div class="content" id="com-exterior" style="display: none;"><div class="content-box"></div></div>
   <div class="content" id="com-interior" style="display: none;"><div class="content-box"></div></div>
 
+  <!-- Login Modal -->
+  <div id="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
+    <div id="login-modal-content">
+      <h2 id="login-modal-title">Admin Login</h2>
+      <input type="email" id="login-email" placeholder="Email" required />
+      <input type="password" id="login-password" placeholder="Password" required />
+      <button id="login-submit-btn">Log In</button>
+      <div id="login-error"></div>
+    </div>
+  </div>
+
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
 
-  <!-- Firebase Setup (REPLACE with your actual config) -->
+  <!-- Firebase Setup -->
   <script>
     const firebaseConfig = {
-  apiKey: "AIzaSyBtndRroVa279cpMzQlIiphU1W9Uw_Yg6U",
-  authDomain: "kravin-delivery.firebaseapp.com",
-  projectId: "kravin-delivery",
-  storageBucket: "kravin-delivery.firebasestorage.app",
-  messagingSenderId: "862159900289",
-  appId: "1:862159900289:web:18797ef8343e6329cb0780"
-};
+      apiKey: "AIzaSyBtndRroVa279cpMzQlIiphU1W9Uw_Yg6U",
+      authDomain: "kravin-delivery.firebaseapp.com",
+      projectId: "kravin-delivery",
+      storageBucket: "kravin-delivery.firebasestorage.app",
+      messagingSenderId: "862159900289",
+      appId: "1:862159900289:web:18797ef8343e6329cb0780"
+    };
+
     const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore(app);
+    const auth = firebase.auth();
   </script>
 
-  <!-- Main JavaScript -->
   <script>
     const menuBtn = document.getElementById('menuBtn');
     const menu = document.getElementById('menu');
@@ -256,6 +316,7 @@
 
     async function loadSectionContent(sectionId) {
       const box = document.querySelector(`#${sectionId} .content-box`);
+      const db = firebase.firestore();
       const docRef = db.collection('sections').doc(sectionId);
       const doc = await docRef.get();
 
@@ -278,6 +339,47 @@
     // Load welcome section on first visit
     window.addEventListener('DOMContentLoaded', () => {
       loadSectionContent('default-content');
+    });
+
+    // ADMIN DASHBOARD LOGIN FLOW
+    const adminDashboardBtn = document.getElementById('admin-dashboard-btn');
+    const loginModal = document.getElementById('login-modal');
+    const loginSubmitBtn = document.getElementById('login-submit-btn');
+    const loginEmail = document.getElementById('login-email');
+    const loginPassword = document.getElementById('login-password');
+    const loginError = document.getElementById('login-error');
+
+    adminDashboardBtn.addEventListener('click', e => {
+      e.preventDefault();
+      loginError.textContent = '';
+      loginEmail.value = '';
+      loginPassword.value = '';
+      loginModal.style.display = 'block';
+    });
+
+    loginSubmitBtn.addEventListener('click', async () => {
+      const email = loginEmail.value.trim();
+      const password = loginPassword.value.trim();
+      loginError.textContent = '';
+      if (!email || !password) {
+        loginError.textContent = 'Please enter both email and password.';
+        return;
+      }
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        loginModal.style.display = 'none';
+        // Redirect to admin dashboard after successful login
+        window.location.href = 'admindashboard.html';
+      } catch (error) {
+        loginError.textContent = error.message;
+      }
+    });
+
+    // Close modal if user clicks outside content
+    window.addEventListener('click', (event) => {
+      if (event.target === loginModal) {
+        loginModal.style.display = 'none';
+      }
     });
   </script>
 </body>
