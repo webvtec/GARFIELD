@@ -2,93 +2,54 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Garfield Painting</title>
   <style>
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
-      background: #f9f9f9;
+      margin: 0;
+      background: #f0f0f0;
     }
 
     .top-bar {
-      position: relative;
-      background-color: #FF1493;
-      height: 60px;
-    }
-
-    .menu-btn {
-      position: absolute;
-      top: 0;
-      left: 0;
-      padding: 12px 16px;
-      background-color: #177FB9;
-      color: white;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-      height: 60px;
-      z-index: 200;
-    }
-
-    .call-btn {
-      position: absolute;
-      top: 0;
-      right: 0;
-      padding: 0 16px;
-      background-color: #177FB9;
-      color: white;
-      text-decoration: none;
-      font-size: 20px;
-      border: none;
-      cursor: pointer;
-      height: 60px;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      z-index: 200;
+      background: #333;
+      color: white;
+      padding: 10px 15px;
+    }
+
+    .menu-btn, .call-btn {
+      font-size: 20px;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
     }
 
     .top-bar-title {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8em;
+      font-size: 24px;
       font-weight: bold;
-      color: black;
-      font-family: Arial, sans-serif;
-      user-select: none;
-      white-space: nowrap;
-      letter-spacing: 4px;
-      line-height: 1;
-      pointer-events: none;
-      z-index: 150;
     }
 
     #menu {
       display: none;
+      background: #444;
       position: absolute;
-      top: 60px;
+      top: 50px;
       left: 0;
-      background-color: rgba(23, 127, 185, 0.8);
-      width: 200px;
-      text-align: left;
-      box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
-      z-index: 100;
+      right: 0;
+      z-index: 1000;
     }
 
-    #menu > ul {
+    #menu ul {
       list-style: none;
       margin: 0;
       padding: 0;
     }
 
     #menu > ul > li {
-      position: relative;
       border-bottom: 1px solid rgba(255,255,255,0.3);
     }
 
@@ -97,67 +58,23 @@
       padding: 10px 15px;
       color: white;
       text-decoration: none;
-      cursor: pointer;
-      position: relative;
-      user-select: none;
-    }
-
-    #menu a:hover {
-      background-color: #177FB9;
-    }
-
-    .has-dropdown > a::after {
-      content: "▼";
-      position: absolute;
-      right: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 0.7em;
-      pointer-events: none;
     }
 
     .dropdown {
       display: none;
-      background-color: rgba(23, 127, 185, 0.9);
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-
-    .dropdown li a {
-      padding-left: 30px;
-      font-size: 0.9em;
-    }
-
-    .dropdown li a:hover {
-      background-color: #0f4c72;
+      background: #555;
     }
 
     .content {
-      padding: 40px;
-      text-align: center;
+      padding: 20px;
+      display: none;
     }
 
     .content-box {
       background: white;
-      max-width: 700px;
-      margin: 0 auto;
       padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-
-    .content-box img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
-
-    .content-box p {
-      font-size: 1.1em;
-      color: #333;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
   </style>
 </head>
@@ -167,81 +84,62 @@
     <button class="menu-btn" id="menuBtn">☰</button>
     <div class="top-bar-title">GARFIELD</div>
     <a class="call-btn" href="tel:+16477077600">📞</a>
-
-    <nav id="menu" role="navigation" aria-label="Main Menu">
-      <ul>
-        <li class="has-dropdown">
-          <a href="#" class="dropdown-toggle" data-submenu="residential-submenu">Residential Painting</a>
-          <ul id="residential-submenu" class="dropdown" aria-label="Residential submenu">
-            <li><a href="#" onclick="showSection('res-exterior')">EXTERIOR PAINTING</a></li>
-            <li><a href="#" onclick="showSection('res-interior')">INTERIOR PAINTING</a></li>
-          </ul>
-        </li>
-        <li class="has-dropdown">
-          <a href="#" class="dropdown-toggle" data-submenu="commercial-submenu">Commercial Painting</a>
-          <ul id="commercial-submenu" class="dropdown" aria-label="Commercial submenu">
-            <li><a href="#" onclick="showSection('com-exterior')">EXTERIOR PAINTING</a></li>
-            <li><a href="#" onclick="showSection('com-interior')">INTERIOR PAINTING</a></li>
-          </ul>
-        </li>
-        <li>
-          <a href="#line">Line Painting</a>
-        </li>
-        <li>
-          <a href="#" onclick="showSection('reviews')">Reviews</a>
-        </li>
-      </ul>
-    </nav>
   </div>
 
-  <div class="content" id="default-content">
+  <nav id="menu" role="navigation" aria-label="Main Menu">
+    <ul>
+      <li><a href="#" onclick="showSection('default-content')">Home</a></li>
+      <li><a href="#" onclick="showSection('res-exterior')">Residential Exterior</a></li>
+      <li><a href="#" onclick="showSection('res-interior')">Residential Interior</a></li>
+      <li><a href="#" onclick="showSection('com-exterior')">Commercial Exterior</a></li>
+      <li><a href="#" onclick="showSection('com-interior')">Commercial Interior</a></li>
+      <li><a href="#" onclick="showSection('reviews')">Reviews</a></li>
+    </ul>
+  </nav>
+
+  <!-- Example content sections -->
+  <div class="content" id="default-content" style="display: block;">
     <div class="content-box">
-      <img src="https://res.cloudinary.com/dqqr9udcs/image/upload/v1749969069/1T0delivery_33_mtdk7g.jpg" alt="Garfield Painting Services" />
-      <p>We provide professional painting services for homes, businesses, and roads!</p>
+      <h2>Welcome to Garfield Painting</h2>
+      <p>Professional and affordable painting services in Jamaica.</p>
     </div>
   </div>
 
-  <!-- RESIDENTIAL -->
-  <div class="content" id="res-exterior" style="display: none;">
+  <div class="content" id="res-exterior">
     <div class="content-box">
-      <h2>Residential Exterior Painting</h2>
-      <img src="https://via.placeholder.com/700x400?text=Residential+Exterior" alt="Residential Exterior Painting">
-      <p>We provide professional exterior painting for houses with high-quality finishes that protect your home from the elements.</p>
+      <h2>Residential Exterior</h2>
+      <p>Content goes here...</p>
     </div>
   </div>
 
-  <div class="content" id="res-interior" style="display: none;">
+  <div class="content" id="res-interior">
     <div class="content-box">
-      <h2>Residential Interior Painting</h2>
-      <img src="https://via.placeholder.com/700x400?text=Residential+Interior" alt="Residential Interior Painting">
-      <p>Update your living space with fresh, detailed interior paint that reflects your style and enhances comfort.</p>
+      <h2>Residential Interior</h2>
+      <p>Content goes here...</p>
     </div>
   </div>
 
-  <!-- COMMERCIAL -->
-  <div class="content" id="com-exterior" style="display: none;">
+  <div class="content" id="com-exterior">
     <div class="content-box">
-      <h2>Commercial Exterior Painting</h2>
-      <img src="https://via.placeholder.com/700x400?text=Commercial+Exterior" alt="Commercial Exterior Painting">
-      <p>Make a strong first impression with clean, durable exterior paint on your commercial building. We work efficiently with minimal disruption.</p>
+      <h2>Commercial Exterior</h2>
+      <p>Content goes here...</p>
     </div>
   </div>
 
-  <div class="content" id="com-interior" style="display: none;">
+  <div class="content" id="com-interior">
     <div class="content-box">
-      <h2>Commercial Interior Painting</h2>
-      <img src="https://via.placeholder.com/700x400?text=Commercial+Interior" alt="Commercial Interior Painting">
-      <p>We deliver crisp, professional interior paint jobs for offices, shops, and business interiors that reflect your brand.</p>
+      <h2>Commercial Interior</h2>
+      <p>Content goes here...</p>
     </div>
   </div>
 
   <!-- REVIEWS -->
-  <div class="content" id="reviews" style="display: none;">
+  <div class="content" id="reviews">
     <div class="content-box">
       <h2>Customer Reviews</h2>
-      <p>"Garfield Painting did an amazing job on our home! Highly recommended." — <strong>Sarah M.</strong></p>
-      <p>"Very professional and neat work. Our office looks brand new!" — <strong>Derrick L.</strong></p>
-      <p>"Affordable pricing and great service." — <strong>Annette P.</strong></p>
+      <div id="reviews-container">
+        <!-- Reviews will be dynamically inserted here -->
+      </div>
     </div>
   </div>
 
@@ -252,17 +150,6 @@
     menuBtn.addEventListener('click', e => {
       e.stopPropagation();
       menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
-    });
-
-    document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
-      toggle.addEventListener('click', e => {
-        e.preventDefault();
-        e.stopPropagation();
-        const submenu = document.getElementById(toggle.dataset.submenu);
-        if (!submenu) return;
-        document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
-        submenu.style.display = 'block';
-      });
     });
 
     document.addEventListener('click', e => {
@@ -282,8 +169,34 @@
       allSections.forEach(id => {
         document.getElementById(id).style.display = (id === sectionId) ? 'block' : 'none';
       });
+
+      if (sectionId === 'reviews') loadReviews();
+
       document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
     }
+
+    // Temporary review data (to be replaced with Firebase later)
+    const reviewsData = [
+      { text: "Garfield Painting did an amazing job on our home! Highly recommended.", author: "Sarah M." },
+      { text: "Very professional and neat work. Our office looks brand new!", author: "Derrick L." },
+      { text: "Affordable pricing and great service.", author: "Annette P." }
+    ];
+
+    function loadReviews() {
+      const container = document.getElementById('reviews-container');
+      container.innerHTML = '';
+      reviewsData.forEach(review => {
+        const p = document.createElement('p');
+        p.innerHTML = `"${review.text}" — <strong>${review.author}</strong>`;
+        container.appendChild(p);
+      });
+    }
+
+    // Load default section reviews if needed
+    window.addEventListener('DOMContentLoaded', () => {
+      loadReviews();
+    });
   </script>
+
 </body>
 </html>
