@@ -60,11 +60,6 @@
       text-decoration: none;
     }
 
-    .dropdown {
-      display: none;
-      background: #555;
-    }
-
     .content {
       padding: 20px;
       display: none;
@@ -75,6 +70,14 @@
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .content-box img {
+      width: 100%;
+      max-height: 300px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 15px;
     }
   </style>
 </head>
@@ -93,11 +96,10 @@
       <li><a href="#" onclick="showSection('res-interior')">Residential Interior</a></li>
       <li><a href="#" onclick="showSection('com-exterior')">Commercial Exterior</a></li>
       <li><a href="#" onclick="showSection('com-interior')">Commercial Interior</a></li>
-      <li><a href="#" onclick="showSection('reviews')">Reviews</a></li>
     </ul>
   </nav>
 
-  <!-- Example content sections -->
+  <!-- Default Home Section -->
   <div class="content" id="default-content" style="display: block;">
     <div class="content-box">
       <h2>Welcome to Garfield Painting</h2>
@@ -105,97 +107,79 @@
     </div>
   </div>
 
-  <div class="content" id="res-exterior">
-    <div class="content-box">
-      <h2>Residential Exterior</h2>
-      <p>Content goes here...</p>
-    </div>
-  </div>
+  <!-- Dynamic Sections -->
+  <div class="content" id="res-exterior"><div class="content-box" id="res-exterior-box"></div></div>
+  <div class="content" id="res-interior"><div class="content-box" id="res-interior-box"></div></div>
+  <div class="content" id="com-exterior"><div class="content-box" id="com-exterior-box"></div></div>
+  <div class="content" id="com-interior"><div class="content-box" id="com-interior-box"></div></div>
 
-  <div class="content" id="res-interior">
-    <div class="content-box">
-      <h2>Residential Interior</h2>
-      <p>Content goes here...</p>
-    </div>
-  </div>
-
-  <div class="content" id="com-exterior">
-    <div class="content-box">
-      <h2>Commercial Exterior</h2>
-      <p>Content goes here...</p>
-    </div>
-  </div>
-
-  <div class="content" id="com-interior">
-    <div class="content-box">
-      <h2>Commercial Interior</h2>
-      <p>Content goes here...</p>
-    </div>
-  </div>
-
-  <!-- REVIEWS -->
-  <div class="content" id="reviews">
-    <div class="content-box">
-      <h2>Customer Reviews</h2>
-      <div id="reviews-container">
-        <!-- Reviews will be dynamically inserted here -->
-      </div>
-    </div>
-  </div>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
 
   <script>
+    // Replace with your actual Firebase config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore(app);
+  </script>
+
+  <script>
+    const sections = ['res-exterior', 'res-interior', 'com-exterior', 'com-interior'];
+
+    async function loadSections() {
+      for (const id of sections) {
+        const doc = await db.collection('sections').doc(id).get();
+        const box = document.getElementById(`${id}-box`);
+
+        if (doc.exists) {
+          const data = doc.data();
+          box.innerHTML = `
+            <h2>${formatTitle(id)}</h2>
+            ${data.image ? `<img src="${data.image}" alt="${id} Image" />` : ''}
+            <p>${data.description || ''}</p>
+          `;
+        } else {
+          box.innerHTML = `<h2>${formatTitle(id)}</h2><p>No content found.</p>`;
+        }
+      }
+    }
+
+    function formatTitle(id) {
+      return id.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    function showSection(sectionId) {
+      const allSections = ['default-content', ...sections];
+      allSections.forEach(id => {
+        document.getElementById(id).style.display = (id === sectionId) ? 'block' : 'none';
+      });
+      document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Menu toggle
     const menuBtn = document.getElementById('menuBtn');
     const menu = document.getElementById('menu');
-
     menuBtn.addEventListener('click', e => {
       e.stopPropagation();
       menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
     });
-
     document.addEventListener('click', e => {
       if (!menu.contains(e.target) && e.target !== menuBtn) {
         menu.style.display = 'none';
-        document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
       }
     });
 
-    function showSection(sectionId) {
-      const allSections = [
-        'default-content',
-        'res-exterior', 'res-interior',
-        'com-exterior', 'com-interior',
-        'reviews'
-      ];
-      allSections.forEach(id => {
-        document.getElementById(id).style.display = (id === sectionId) ? 'block' : 'none';
-      });
-
-      if (sectionId === 'reviews') loadReviews();
-
-      document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
-    }
-
-    // Temporary review data (to be replaced with Firebase later)
-    const reviewsData = [
-      { text: "Garfield Painting did an amazing job on our home! Highly recommended.", author: "Sarah M." },
-      { text: "Very professional and neat work. Our office looks brand new!", author: "Derrick L." },
-      { text: "Affordable pricing and great service.", author: "Annette P." }
-    ];
-
-    function loadReviews() {
-      const container = document.getElementById('reviews-container');
-      container.innerHTML = '';
-      reviewsData.forEach(review => {
-        const p = document.createElement('p');
-        p.innerHTML = `"${review.text}" — <strong>${review.author}</strong>`;
-        container.appendChild(p);
-      });
-    }
-
-    // Load default section reviews if needed
-    window.addEventListener('DOMContentLoaded', () => {
-      loadReviews();
-    });
+    // Load section data on page load
+    window.addEventListener('DOMContentLoaded', loadSections);
   </script>
 
 </body>
