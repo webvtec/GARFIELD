@@ -5,7 +5,6 @@
   <title>Admin Dashboard</title>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js"></script>
   <style>
     body { font-family: Arial; padding: 40px; background: #f2f2f2; }
     input, textarea, select, button { margin: 10px 0; padding: 10px; width: 100%; max-width: 400px; }
@@ -34,7 +33,7 @@
       <option value="com-interior">Commercial - Interior</option>
     </select>
     <textarea id="description" placeholder="Enter description here..."></textarea>
-    <input type="file" id="imageUpload" accept="image/*" />
+    <input type="url" id="image-url" placeholder="Paste image URL here (optional)" />
     <button onclick="saveSection()">Save Section</button>
     <p id="status" style="color: green;"></p>
   </div>
@@ -52,9 +51,8 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    const storage = firebase.storage();
 
-    // Fixed Login - same as index.html
+    // Fixed Login
     const FIXED_EMAIL = "carlanviroberts@gmail.com";
     const FIXED_PASSWORD = "@Carlanvi321";
 
@@ -74,21 +72,13 @@
 
     async function saveSection() {
       const sectionId = document.getElementById("section-select").value;
-      const description = document.getElementById("description").value;
-      const file = document.getElementById("imageUpload").files[0];
+      const description = document.getElementById("description").value.trim();
+      const imageURL = document.getElementById("image-url").value.trim();
       const status = document.getElementById("status");
 
       status.textContent = "Saving...";
 
       try {
-        let imageURL = "";
-
-        if (file) {
-          const storageRef = storage.ref().child(`sections/${sectionId}/${file.name}`);
-          await storageRef.put(file);
-          imageURL = await storageRef.getDownloadURL();
-        }
-
         const data = { description };
         if (imageURL) data.image = imageURL;
 
@@ -96,11 +86,10 @@
 
         status.textContent = "Section saved successfully!";
       } catch (error) {
-        console.error("Save error:", error);
+        console.error(error);
         status.textContent = "Failed to save section.";
       }
     }
   </script>
-
 </body>
 </html>
