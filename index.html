@@ -11,19 +11,16 @@
       background: #f9f9f9;
     }
 
-    /* Top bar */
     .top-bar {
       position: relative;
       background-color: #FF1493;
       height: 60px;
     }
 
-    /* Menu button (top-left) */
     .menu-btn {
       position: absolute;
       top: 0;
       left: 0;
-      margin: 0;
       padding: 12px 16px;
       background-color: #177FB9;
       color: white;
@@ -31,15 +28,13 @@
       font-size: 20px;
       cursor: pointer;
       height: 60px;
-      z-index: 200; /* above menu */
+      z-index: 200;
     }
 
-    /* Call button (top-right) */
     .call-btn {
       position: absolute;
       top: 0;
       right: 0;
-      margin: 0;
       padding: 0 16px;
       background-color: #177FB9;
       color: white;
@@ -50,10 +45,9 @@
       height: 60px;
       display: flex;
       align-items: center;
-      z-index: 200; /* above menu */
+      z-index: 200;
     }
 
-    /* Centered title */
     .top-bar-title {
       position: absolute;
       top: 0;
@@ -71,11 +65,10 @@
       white-space: nowrap;
       letter-spacing: 4px;
       line-height: 1;
-      pointer-events: none; /* prevent interaction */
+      pointer-events: none;
       z-index: 150;
     }
 
-    /* Dropdown menu container */
     #menu {
       display: none;
       position: absolute;
@@ -88,7 +81,6 @@
       z-index: 100;
     }
 
-    /* Main menu list */
     #menu > ul {
       list-style: none;
       margin: 0;
@@ -114,7 +106,6 @@
       background-color: #177FB9;
     }
 
-    /* Arrows for dropdown parents */
     .has-dropdown > a::after {
       content: "▼";
       position: absolute;
@@ -125,13 +116,12 @@
       pointer-events: none;
     }
 
-    /* Submenus */
     .dropdown {
       display: none;
       background-color: rgba(23, 127, 185, 0.9);
+      list-style: none;
       margin: 0;
       padding: 0;
-      list-style: none;
     }
 
     .dropdown li a {
@@ -143,63 +133,55 @@
       background-color: #0f4c72;
     }
 
-    /* Content styling */
     .content {
       padding: 40px;
       text-align: center;
     }
 
     .content-box {
-  background: white;
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-  text-align: center;
-}
+      background: white;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      text-align: center;
+    }
 
-.content-box img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
+    .content-box img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
 
-.content-box p {
-  font-size: 1.1em;
-  color: #333;
-}
-
+    .content-box p {
+      font-size: 1.1em;
+      color: #333;
+    }
   </style>
 </head>
 <body>
 
   <div class="top-bar">
-    <!-- Menu Button -->
     <button class="menu-btn" id="menuBtn">☰</button>
-
-    <!-- Centered Title -->
     <div class="top-bar-title">GARFIELD</div>
-
-    <!-- Call Button -->
     <a class="call-btn" href="tel:+16477077600">📞</a>
 
-    <!-- Dropdown Menu -->
     <nav id="menu" role="navigation" aria-label="Main Menu">
       <ul>
         <li class="has-dropdown">
           <a href="#" class="dropdown-toggle" data-submenu="residential-submenu">Residential Painting</a>
           <ul id="residential-submenu" class="dropdown" aria-label="Residential submenu">
-            <li><a href="#">EXTERIOR PAINTING</a></li>
-            <li><a href="#">INTERIOR PAINTING</a></li>
+            <li><a href="#" onclick="showSection('res-exterior')">EXTERIOR PAINTING</a></li>
+            <li><a href="#" onclick="showSection('res-interior')">INTERIOR PAINTING</a></li>
           </ul>
         </li>
         <li class="has-dropdown">
           <a href="#" class="dropdown-toggle" data-submenu="commercial-submenu">Commercial Painting</a>
           <ul id="commercial-submenu" class="dropdown" aria-label="Commercial submenu">
-            <li><a href="#">EXTERIOR PAINTING</a></li>
-            <li><a href="#">INTERIOR PAINTING</a></li>
+            <li><a href="#" onclick="showSection('com-exterior')">EXTERIOR PAINTING</a></li>
+            <li><a href="#" onclick="showSection('com-interior')">INTERIOR PAINTING</a></li>
           </ul>
         </li>
         <li>
@@ -209,77 +191,85 @@
     </nav>
   </div>
 
-  <div class="content">
-  <div class="content-box">
-    <img src="https://res.cloudinary.com/dqqr9udcs/image/upload/v1749969069/1T0delivery_33_mtdk7g.jpg" alt="Garfield Painting Services" />
-    <p>We provide professional painting services for homes, businesses, and roads!</p>
-  </div>
-</div>
-
-  <div class="content">
-  <div class="content-box">
-    <img src="https://res.cloudinary.com/dqqr9udcs/image/upload/v1749969069/1T0delivery_33_mtdk7g.jpg" alt="Garfield Painting Services" />
-    <p>We provide professional painting services for homes, businesses, and roads!</p>
-  </div>
+  <div class="content" id="default-content">
+    <div class="content-box">
+      <img src="https://res.cloudinary.com/dqqr9udcs/image/upload/v1749969069/1T0delivery_33_mtdk7g.jpg" alt="Garfield Painting Services" />
+      <p>We provide professional painting services for homes, businesses, and roads!</p>
+    </div>
   </div>
 
-  <div class="content">
-  <div class="content-box">
-    <img src="https://res.cloudinary.com/dqqr9udcs/image/upload/v1749969069/1T0delivery_33_mtdk7g.jpg" alt="Garfield Painting Services" />
-    <p>We provide professional painting services for homes, businesses, and roads!</p>
+  <!-- RESIDENTIAL -->
+  <div class="content" id="res-exterior" style="display: none;">
+    <div class="content-box">
+      <h2>Residential Exterior Painting</h2>
+      <img src="https://via.placeholder.com/700x400?text=Residential+Exterior" alt="Residential Exterior Painting">
+      <p>We provide professional exterior painting for houses with high-quality finishes that protect your home from the elements.</p>
+    </div>
   </div>
+
+  <div class="content" id="res-interior" style="display: none;">
+    <div class="content-box">
+      <h2>Residential Interior Painting</h2>
+      <img src="https://via.placeholder.com/700x400?text=Residential+Interior" alt="Residential Interior Painting">
+      <p>Update your living space with fresh, detailed interior paint that reflects your style and enhances comfort.</p>
+    </div>
+  </div>
+
+  <!-- COMMERCIAL -->
+  <div class="content" id="com-exterior" style="display: none;">
+    <div class="content-box">
+      <h2>Commercial Exterior Painting</h2>
+      <img src="https://via.placeholder.com/700x400?text=Commercial+Exterior" alt="Commercial Exterior Painting">
+      <p>Make a strong first impression with clean, durable exterior paint on your commercial building. We work efficiently with minimal disruption.</p>
+    </div>
+  </div>
+
+  <div class="content" id="com-interior" style="display: none;">
+    <div class="content-box">
+      <h2>Commercial Interior Painting</h2>
+      <img src="https://via.placeholder.com/700x400?text=Commercial+Interior" alt="Commercial Interior Painting">
+      <p>We deliver crisp, professional interior paint jobs for offices, shops, and business interiors that reflect your brand.</p>
+    </div>
   </div>
 
   <script>
     const menuBtn = document.getElementById('menuBtn');
     const menu = document.getElementById('menu');
 
-    // Toggle entire menu visibility
     menuBtn.addEventListener('click', e => {
       e.stopPropagation();
-      if (menu.style.display === 'block') {
-        closeMenu();
-      } else {
-        openMenu();
-      }
+      menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
     });
 
-    // Toggle submenu open/close on click
     document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
       toggle.addEventListener('click', e => {
         e.preventDefault();
         e.stopPropagation();
-        const submenuId = toggle.dataset.submenu;
-        const submenu = document.getElementById(submenuId);
-
+        const submenu = document.getElementById(toggle.dataset.submenu);
         if (!submenu) return;
-
-        if (submenu.style.display === 'block') {
-          submenu.style.display = 'none';
-        } else {
-          // Close any other open submenus
-          document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
-          submenu.style.display = 'block';
-        }
+        document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
+        submenu.style.display = 'block';
       });
     });
 
-    // Close menu and submenus
-    function closeMenu() {
-      menu.style.display = 'none';
-      document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
-    }
-
-    function openMenu() {
-      menu.style.display = 'block';
-    }
-
-    // Clicking outside closes menu and submenus
     document.addEventListener('click', e => {
       if (!menu.contains(e.target) && e.target !== menuBtn) {
-        closeMenu();
+        menu.style.display = 'none';
+        document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
       }
     });
+
+    function showSection(sectionId) {
+      const allSections = [
+        'default-content',
+        'res-exterior', 'res-interior',
+        'com-exterior', 'com-interior'
+      ];
+      allSections.forEach(id => {
+        document.getElementById(id).style.display = (id === sectionId) ? 'block' : 'none';
+      });
+      document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+    }
   </script>
 </body>
 </html>
