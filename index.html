@@ -160,16 +160,15 @@
       color: #333;
     }
 
-    /* Login modal styles */
+    /* Login modal styles - fixed */
     #login-modal {
-      display: none;
+      display: none; /* keep it hidden by default */
       position: fixed;
       z-index: 500;
       left: 0; top: 0;
       width: 100vw;
       height: 100vh;
       background-color: rgba(0,0,0,0.5);
-      display: flex;
       justify-content: center;
       align-items: center;
     }
@@ -250,7 +249,6 @@
           </ul>
         </li>
         <li><a href="#line">Line Painting</a></li>
-        <!-- Admin Dashboard button with id for JS -->
         <li><a href="#" id="admin-dashboard-btn">Admin Dashboard</a></li>
       </ul>
     </nav>
@@ -340,7 +338,6 @@
       return id.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase());
     }
 
-    // Load welcome section on first visit
     window.addEventListener('DOMContentLoaded', () => {
       loadSectionContent('default-content');
     });
@@ -365,7 +362,6 @@
     const loginPassword = document.getElementById('login-password');
     const loginError = document.getElementById('login-error');
 
-    // Fixed credentials
     const FIXED_EMAIL = "carlanviroberts@gmail.com";
     const FIXED_PASSWORD = "@Carlanvi321";
 
@@ -396,14 +392,12 @@
       }
     });
 
-    // Close modal if clicking outside content
     window.addEventListener('click', (event) => {
       if (event.target === loginModal) {
         loginModal.style.display = 'none';
       }
     });
 
-    // Optional: Enter key submits login form
     loginPassword.addEventListener('keyup', (e) => {
       if (e.key === 'Enter') {
         loginSubmitBtn.click();
