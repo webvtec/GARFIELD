@@ -11,14 +11,12 @@
       background: #f9f9f9;
     }
 
-    /* Top bar */
     .top-bar {
       position: relative;
       background-color: #FF1493;
       height: 60px;
     }
 
-    /* Menu button (top-left) */
     .menu-btn {
       position: absolute;
       top: 0;
@@ -33,7 +31,6 @@
       z-index: 200;
     }
 
-    /* Call button (top-right) */
     .call-btn {
       position: absolute;
       top: 0;
@@ -51,7 +48,6 @@
       z-index: 200;
     }
 
-    /* Centered title */
     .top-bar-title {
       position: absolute;
       top: 0;
@@ -73,7 +69,6 @@
       z-index: 150;
     }
 
-    /* Dropdown menu */
     #menu {
       display: none;
       position: absolute;
@@ -178,8 +173,8 @@
         <li class="has-dropdown">
           <a href="#" class="dropdown-toggle" data-submenu="residential-submenu">Residential Painting</a>
           <ul id="residential-submenu" class="dropdown" aria-label="Residential submenu">
-            <li><a href="exterior.html">EXTERIOR PAINTING</a></li>
-            <li><a href="interior.html">INTERIOR PAINTING</a></li>
+            <li><a href="#" onclick="showSection('exterior')">EXTERIOR PAINTING</a></li>
+            <li><a href="#" onclick="showSection('interior')">INTERIOR PAINTING</a></li>
           </ul>
         </li>
         <li class="has-dropdown">
@@ -196,10 +191,28 @@
     </nav>
   </div>
 
-  <div class="content">
+  <div class="content" id="default-content">
     <div class="content-box">
       <img src="https://res.cloudinary.com/dqqr9udcs/image/upload/v1749969069/1T0delivery_33_mtdk7g.jpg" alt="Garfield Painting Services" />
       <p>We provide professional painting services for homes, businesses, and roads!</p>
+    </div>
+  </div>
+
+  <!-- Exterior Painting Section -->
+  <div class="content" id="exterior" style="display: none;">
+    <div class="content-box">
+      <h2>Exterior Painting</h2>
+      <img src="https://via.placeholder.com/700x400?text=Exterior+Painting" alt="Exterior Painting">
+      <p>We specialize in high-quality exterior painting for homes and buildings. Our team uses durable, weather-resistant paint to make your property look great and last longer.</p>
+    </div>
+  </div>
+
+  <!-- Interior Painting Section -->
+  <div class="content" id="interior" style="display: none;">
+    <div class="content-box">
+      <h2>Interior Painting</h2>
+      <img src="https://via.placeholder.com/700x400?text=Interior+Painting" alt="Interior Painting">
+      <p>Transform your indoor spaces with professional interior painting. We offer neat, clean finishes and a variety of colors to match your vision.</p>
     </div>
   </div>
 
@@ -229,6 +242,14 @@
         document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
       }
     });
+
+    function showSection(sectionId) {
+      const sections = ['default-content', 'exterior', 'interior'];
+      sections.forEach(id => {
+        document.getElementById(id).style.display = (id === sectionId) ? 'block' : 'none';
+      });
+      document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+    }
   </script>
 </body>
 </html>
