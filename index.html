@@ -164,36 +164,35 @@
 <body>
 
   <div class="top-bar">
-  <button class="menu-btn" id="menuBtn">☰</button>
-  <div class="top-bar-title">GARFIELD</div>
-  <a class="call-btn" href="tel:+16477077600">📞</a>
+    <button class="menu-btn" id="menuBtn">☰</button>
+    <div class="top-bar-title">GARFIELD</div>
+    <a class="call-btn" href="tel:+16477077600">📞</a>
 
-  <nav id="menu" role="navigation" aria-label="Main Menu">
-    <ul>
-      <li class="has-dropdown">
-        <a href="#" class="dropdown-toggle" data-submenu="residential-submenu">Residential Painting</a>
-        <ul id="residential-submenu" class="dropdown" aria-label="Residential submenu">
-          <li><a href="#" onclick="showSection('res-exterior')">EXTERIOR PAINTING</a></li>
-          <li><a href="#" onclick="showSection('res-interior')">INTERIOR PAINTING</a></li>
-        </ul>
-      </li>
-      <li class="has-dropdown">
-        <a href="#" class="dropdown-toggle" data-submenu="commercial-submenu">Commercial Painting</a>
-        <ul id="commercial-submenu" class="dropdown" aria-label="Commercial submenu">
-          <li><a href="#" onclick="showSection('com-exterior')">EXTERIOR PAINTING</a></li>
-          <li><a href="#" onclick="showSection('com-interior')">INTERIOR PAINTING</a></li>
-        </ul>
-      </li>
-      <li>
-        <a href="#line">Line Painting</a>
-      </li>
-      <li>
-        <a href="#" onclick="showSection('reviews')">Reviews</a>
-      </li>
-    </ul>
-  </nav>
-</div>
-
+    <nav id="menu" role="navigation" aria-label="Main Menu">
+      <ul>
+        <li class="has-dropdown">
+          <a href="#" class="dropdown-toggle" data-submenu="residential-submenu">Residential Painting</a>
+          <ul id="residential-submenu" class="dropdown" aria-label="Residential submenu">
+            <li><a href="#" onclick="showSection('res-exterior')">EXTERIOR PAINTING</a></li>
+            <li><a href="#" onclick="showSection('res-interior')">INTERIOR PAINTING</a></li>
+          </ul>
+        </li>
+        <li class="has-dropdown">
+          <a href="#" class="dropdown-toggle" data-submenu="commercial-submenu">Commercial Painting</a>
+          <ul id="commercial-submenu" class="dropdown" aria-label="Commercial submenu">
+            <li><a href="#" onclick="showSection('com-exterior')">EXTERIOR PAINTING</a></li>
+            <li><a href="#" onclick="showSection('com-interior')">INTERIOR PAINTING</a></li>
+          </ul>
+        </li>
+        <li>
+          <a href="#line">Line Painting</a>
+        </li>
+        <li>
+          <a href="#" onclick="showSection('reviews')">Reviews</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
 
   <div class="content" id="default-content">
     <div class="content-box">
@@ -236,6 +235,16 @@
     </div>
   </div>
 
+  <!-- REVIEWS -->
+  <div class="content" id="reviews" style="display: none;">
+    <div class="content-box">
+      <h2>Customer Reviews</h2>
+      <p>"Garfield Painting did an amazing job on our home! Highly recommended." — <strong>Sarah M.</strong></p>
+      <p>"Very professional and neat work. Our office looks brand new!" — <strong>Derrick L.</strong></p>
+      <p>"Affordable pricing and great service." — <strong>Annette P.</strong></p>
+    </div>
+  </div>
+
   <script>
     const menuBtn = document.getElementById('menuBtn');
     const menu = document.getElementById('menu');
@@ -267,7 +276,8 @@
       const allSections = [
         'default-content',
         'res-exterior', 'res-interior',
-        'com-exterior', 'com-interior'
+        'com-exterior', 'com-interior',
+        'reviews'
       ];
       allSections.forEach(id => {
         document.getElementById(id).style.display = (id === sectionId) ? 'block' : 'none';
