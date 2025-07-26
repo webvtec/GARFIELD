@@ -14,7 +14,7 @@
 <body>
 
   <!-- Login Section -->
-  <div id="login-section">
+  <div id="login-section" class="hidden">
     <h2>Admin Login</h2>
     <input type="email" id="email" placeholder="Email" />
     <input type="password" id="password" placeholder="Password" />
@@ -52,9 +52,22 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Fixed Login
     const FIXED_EMAIL = "carlanviroberts@gmail.com";
     const FIXED_PASSWORD = "@Carlanvi321";
+
+    // ✅ On Load: Check Login Memory
+    window.onload = () => {
+      if (localStorage.getItem("adminLoggedIn") === "true") {
+        showAdmin();
+      } else {
+        document.getElementById("login-section").classList.remove("hidden");
+      }
+    };
+
+    function showAdmin() {
+      document.getElementById("login-section").classList.add("hidden");
+      document.getElementById("admin-section").classList.remove("hidden");
+    }
 
     function manualLogin() {
       const email = document.getElementById("email").value.trim();
@@ -62,8 +75,8 @@
       const errorEl = document.getElementById("login-error");
 
       if (email === FIXED_EMAIL && password === FIXED_PASSWORD) {
-        document.getElementById("login-section").classList.add("hidden");
-        document.getElementById("admin-section").classList.remove("hidden");
+        localStorage.setItem("adminLoggedIn", "true");
+        showAdmin();
         errorEl.textContent = "";
       } else {
         errorEl.textContent = "Invalid email or password.";
