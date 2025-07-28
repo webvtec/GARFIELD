@@ -151,14 +151,13 @@
     }
 
     .entry img.round-image {
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  object-fit: cover;
-  display: block;
-  margin: 0 auto 12px;
-}
-
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      margin: 0 auto 12px;
+    }
 
     /* New wrapper for image + header overlay */
     .image-header-wrapper {
@@ -309,39 +308,39 @@
   <div class="content" id="com-interior" style="display: none;"><div class="content-box"></div></div>
   <div class="content" id="line-painting" style="display: none;"><div class="content-box"></div></div>
 
-  <div id="reviewsSection" class="content-section">
-  <h1 style="text-align:center; color:#6200ea;">REVIEWS</h1>
+  <div id="reviewsSection" class="content-section" style="display:none;">
+    <h1 style="text-align:center; color:#6200ea;">REVIEWS</h1>
 
-  <form id="reviewForm" style="max-width:500px; margin:10px auto; text-align:center;">
-    <input type="text" id="reviewName" placeholder="Your Name" required
-      style="width:100%; margin-bottom:10px; padding:10px; border-radius:6px; border:1px solid #ccc;" />
+    <form id="reviewForm" style="max-width:500px; margin:10px auto; text-align:center;">
+      <input type="text" id="reviewName" placeholder="Your Name" required
+        style="width:100%; margin-bottom:10px; padding:10px; border-radius:6px; border:1px solid #ccc;" />
 
-    <textarea id="reviewComment" placeholder="Write your review..." required
-      style="width:100%; height:80px; margin-bottom:10px; padding:10px; border-radius:6px; border:1px solid #ccc;"></textarea>
+      <textarea id="reviewComment" placeholder="Write your review..." required
+        style="width:100%; height:80px; margin-bottom:10px; padding:10px; border-radius:6px; border:1px solid #ccc;"></textarea>
 
-    <div id="starRating" style="font-size:24px; margin-bottom:10px; cursor:pointer; color:#ccc;">
-      <span data-value="1">★</span>
-      <span data-value="2">★</span>
-      <span data-value="3">★</span>
-      <span data-value="4">★</span>
-      <span data-value="5">★</span>
-    </div>
+      <div id="starRating" style="font-size:24px; margin-bottom:10px; cursor:pointer; color:#ccc;">
+        <span data-value="1">★</span>
+        <span data-value="2">★</span>
+        <span data-value="3">★</span>
+        <span data-value="4">★</span>
+        <span data-value="5">★</span>
+      </div>
 
-    <button type="submit"
-      style="background-color:#6200ea; color:white; border:none; padding:10px 20px; border-radius:6px; cursor:pointer;">Submit
-      Review</button>
-  </form>
+      <button type="submit"
+        style="background-color:#6200ea; color:white; border:none; padding:10px 20px; border-radius:6px; cursor:pointer;">Submit
+        Review</button>
+    </form>
 
-  <p id="reviewSubmitMsg" style="text-align:center; color:green;"></p>
+    <p id="reviewSubmitMsg" style="text-align:center; color:green;"></p>
 
-  <!-- Container where reviews will be loaded -->
-  <div id="reviewsContainer" style="max-width:600px; margin:20px auto;"></div>
+    <!-- Container where reviews will be loaded -->
+    <div id="reviewsContainer" style="max-width:600px; margin:20px auto;"></div>
   </div>
-
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 
   <!-- Firebase Setup -->
   <script>
@@ -357,6 +356,7 @@
 
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
+  const auth = firebase.auth();
   </script>
 
   <!-- Main JavaScript -->
@@ -394,281 +394,161 @@
     });
 
     function showSection(sectionId) {
-  const allSections = ['default-content', 'res-exterior', 'res-interior', 'com-exterior', 'com-interior', 'line-painting', 'reviews'];
-  allSections.forEach(id => {
-    const el = document.getElementById(id);
-    if(el) el.style.display = (id === sectionId) ? 'block' : 'none';
-  });
-
-  if(sectionId !== 'reviews') {
-    loadSectionContent(sectionId);
-  } else {
-    // Call loadReviews if needed, for example:
-    loadReviews(firebase.auth().currentUser);
-  }
-  document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
-}
-
-    async function loadSectionContent(sectionId) {
-  const box = document.querySelector(`#${sectionId} .content-box`);
-  const docRef = db.collection('sections').doc(sectionId);
-
-  try {
-    const doc = await docRef.get();
-
-    if (doc.exists) {
-      const data = doc.data();
-
-      const entries = data.entries || 
-        ((data.description || data.image)
-          ? [{ description: data.description || '', image: data.image || null }]
-          : []);
-
-      if (entries.length === 0) {
-        box.innerHTML = `<p>No content available for this section.</p>`;
-        return;
-      }
-
-      let html = '';
-
-      entries.forEach((entry, idx) => {
-        html += '<div class="entry">';
-
-        // Show header above image
-        if (entry.header) {
-          html += `<h3>${entry.header}</h3>`;
-        }
-
-        // Use round image ONLY for the first image on default-content
-        if (entry.image) {
-          const isDefault = sectionId === 'default-content' && idx === 0;
-          const imgClass = isDefault ? 'round-image' : '';
-          html += `<img src="${entry.image}" class="${imgClass}" alt="${entry.header || 'Image'}" />`;
-        }
-
-        html += `<p>${entry.description || '[No description]'}</p>`;
-        html += '</div>';
+      const allSections = ['default-content', 'res-exterior', 'res-interior', 'com-exterior', 'com-interior', 'line-painting', 'reviewsSection'];
+      allSections.forEach(id => {
+        document.getElementById(id).style.display = (id === sectionId || (sectionId === 'reviews' && id === 'reviewsSection')) ? 'block' : 'none';
       });
 
-      box.innerHTML = html;
-    } else {
-      box.innerHTML = `<p>No content available for this section.</p>`;
+      if(sectionId !== 'reviews') {
+        loadSectionContent(sectionId);
+      } else {
+        loadReviews(auth.currentUser);
+      }
+
+      if (sectionId !== 'reviews') {
+        document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+      } else {
+        document.getElementById('reviewsSection').scrollIntoView({ behavior: 'smooth' });
+      }
     }
-  } catch (error) {
-    console.error("Error loading section:", error);
-    box.innerHTML = `<p>Failed to load content: ${error.message}</p>`;
-  }
-}
+
+    async function loadSectionContent(sectionId) {
+      const box = document.querySelector(`#${sectionId} .content-box`);
+      const docRef = db.collection('sections').doc(sectionId);
+
+      try {
+        const doc = await docRef.get();
+
+        if (doc.exists) {
+          const data = doc.data();
+
+          const entries = data.entries || 
+            ((data.description || data.image)
+              ? [{ description: data.description || '', image: data.image || null }]
+              : []);
+
+          if (entries.length === 0) {
+            box.innerHTML = `<p>No content available for this section.</p>`;
+            return;
+          }
+
+          let html = '';
+
+          entries.forEach((entry, idx) => {
+            html += '<div class="entry">';
+
+            // Show header above image
+            if (entry.header) {
+              html += `<h3>${entry.header}</h3>`;
+            }
+
+            // Use round image ONLY for the first image on default-content
+            if (entry.image) {
+              const isDefault = sectionId === 'default-content' && idx === 0;
+              const imgClass = isDefault ? 'round-image' : '';
+              html += `<img src="${entry.image}" class="${imgClass}" alt="${entry.header || 'Image'}" />`;
+            }
+
+            html += `<p>${entry.description || '[No description]'}</p>`;
+            html += '</div>';
+          });
+
+          box.innerHTML = html;
+        } else {
+          box.innerHTML = `<p>No content available for this section.</p>`;
+        }
+      } catch (error) {
+        console.error("Error loading section:", error);
+        box.innerHTML = `<p>Failed to load content: ${error.message}</p>`;
+      }
+    }
 
     let selectedRating = 0;
 
-// Star rating UI logic
-document.querySelectorAll('#starRating span').forEach(star => {
-  star.addEventListener('click', () => {
-    selectedRating = parseInt(star.getAttribute('data-value'));
-    document.querySelectorAll('#starRating span').forEach(s => {
-      s.style.color = parseInt(s.getAttribute('data-value')) <= selectedRating ? '#f39c12' : '#ccc';
-    });
-  });
-});
-
-// Submit review
-document.getElementById('reviewForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const user = firebase.auth().currentUser;
-  if (!user) {
-    alert("You must be logged in to submit a review.");
-    return;
-  }
-
-  const name = document.getElementById('reviewName').value.trim();
-  const comment = document.getElementById('reviewComment').value.trim();
-  const msg = document.getElementById('reviewSubmitMsg');
-
-  if (!name || !comment || selectedRating === 0) {
-    msg.style.color = "red";
-    msg.textContent = "Please fill all fields and select a star rating.";
-    return;
-  }
-
-  try {
-    await db.collection('reviews').add({
-      name,
-      comment,
-      rating: selectedRating,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      uid: user.uid
+    // Star rating UI logic
+    document.querySelectorAll('#starRating span').forEach(star => {
+      star.addEventListener('click', () => {
+        selectedRating = parseInt(star.getAttribute('data-value'));
+        document.querySelectorAll('#starRating span').forEach(s => {
+          s.style.color = parseInt(s.getAttribute('data-value')) <= selectedRating ? '#f39c12' : '#ccc';
+        });
+      });
     });
 
-    msg.style.color = "green";
-    msg.textContent = "Thank you for your review!";
-    document.getElementById('reviewForm').reset();
-    selectedRating = 0;
-    document.querySelectorAll('#starRating span').forEach(s => s.style.color = '#ccc');
-
-  } catch (error) {
-    console.error("Error submitting review:", error);
-    msg.style.color = "red";
-    msg.textContent = "Error submitting review.";
-  }
-});
-    
-function loadReviews(user) {
-  const container = document.getElementById('reviewsContainer');
-  container.innerHTML = "<p>Loading reviews...</p>";
-
-  db.collection('reviews').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-    if (snapshot.empty) {
-      container.innerHTML = "<p>No reviews yet.</p>";
-      return;
-    }
-
-    container.innerHTML = '';
-    snapshot.forEach(doc => {
-      const d = doc.data();
-      const isOwner = user && d.uid === user.uid;
-
-      // Set star color based on rating value
-      let stars = '';
-      for (let i = 1; i <= 5; i++) {
-        // If the current index is less than or equal to the rating, make it gold
-        stars += `<span style="color: ${i <= d.rating ? '#f39c12' : '#ccc'};">★</span>`;
-      }
-
-      container.innerHTML += `
-        <div style="background:#fff; border:1px solid #eee; padding:10px; margin-bottom:10px;">
-          <div><strong>${d.name}</strong></div>
-          <div>${stars}</div> <!-- Display stars based on rating -->
-          <div>${d.comment}</div>
-          ${isOwner ? `<button onclick="deleteReview('${doc.id}')" style="color:red; cursor:pointer;">Delete</button>` : ''}
-        </div>
-      `;
-    });
-  });
-}
-
-function deleteReview(docId) {
-  const user = firebase.auth().currentUser;
-  if (!user) {
-    alert('You must be logged in to delete reviews.');
-    return;
-  }
-
-  db.collection('reviews').doc(docId).get().then(doc => {
-    if (!doc.exists) {
-      alert("Review not found.");
-      return;
-    }
-
-    const data = doc.data();
-    if (data.uid !== user.uid) {
-      alert("You can only delete your own reviews.");
-      return;
-    }
-
-    // If the review belongs to the current user, delete it
-    db.collection('reviews').doc(docId).delete()
-      .then(() => alert("Review deleted."))
-      .catch(error => alert("Failed to delete review: " + error.message));
-  }).catch(error => {
-    alert("Error fetching review: " + error.message);
-  });
-}
-
-    document.addEventListener('DOMContentLoaded', function () {
-  const logoutBtn = document.getElementById('logoutBtn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
-      firebase.auth().signOut()
-        .then(() => {
-          window.location.href = 'login.html';
-        })
-        .catch((error) => {
-          console.error("Logout error:", error);
-          alert("Failed to log out.");
-        });
-    });
-  }
-});
-
-
-    function formatTitle(id) {
-      // Capitalize each word, replace dashes with spaces
-      return id.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      loadSectionContent('default-content');
-    });
-  </script>
-
-  <!-- Login Modal -->
-  <div id="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
-    <div id="login-modal-content">
-      <h2 id="login-modal-title">Admin Login</h2>
-      <input type="email" id="login-email" placeholder="Email" required />
-      <input type="password" id="login-password" placeholder="Password" required />
-      <button id="login-submit-btn">Log In</button>
-      <div id="login-error" role="alert" aria-live="assertive"></div>
-    </div>
-  </div>
-
-  <script>
-    const adminDashboardBtn = document.getElementById('admin-dashboard-btn');
-    const loginModal = document.getElementById('login-modal');
-    const loginSubmitBtn = document.getElementById('login-submit-btn');
-    const loginEmail = document.getElementById('login-email');
-    const loginPassword = document.getElementById('login-password');
-    const loginError = document.getElementById('login-error');
-
-    const FIXED_EMAIL = "carlanviroberts@gmail.com";
-    const FIXED_PASSWORD = "@Carlanvi321";
-
-    adminDashboardBtn.addEventListener('click', e => {
+    // Submit review
+    document.getElementById('reviewForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      loginError.textContent = '';
-      loginEmail.value = '';
-      loginPassword.value = '';
-      loginModal.style.display = 'flex';
-      loginEmail.focus();
-    });
 
-    loginSubmitBtn.addEventListener('click', () => {
-      const email = loginEmail.value.trim();
-      const password = loginPassword.value.trim();
-      loginError.textContent = '';
-
-      if (!email || !password) {
-        loginError.textContent = 'Please enter both email and password.';
+      const user = auth.currentUser;
+      if (!user) {
+        alert("You must be logged in to submit a review.");
         return;
       }
 
-      if (email === FIXED_EMAIL && password === FIXED_PASSWORD) {
-        loginModal.style.display = 'none';
-        window.location.href = 'admindashboard.html';
-      } else {
-        loginError.textContent = 'YOU ARE NOT AN ADMIN USER.';
-      }
-    });
+      const name = document.getElementById('reviewName').value.trim();
+      const comment = document.getElementById('reviewComment').value.trim();
+      const msg = document.getElementById('reviewSubmitMsg');
 
-    window.addEventListener('click', (event) => {
-      if (event.target === loginModal) {
-        loginModal.style.display = 'none';
+      if (!name || !comment || selectedRating === 0) {
+        msg.style.color = "red";
+        msg.textContent = "Please fill all fields and select a star rating.";
+        return;
       }
-    });
 
-    loginPassword.addEventListener('keyup', (e) => {
-      if (e.key === 'Enter') {
-        loginSubmitBtn.click();
+      try {
+        await db.collection('reviews').add({
+          name,
+          comment,
+          rating: selectedRating,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          uid: user.uid
+        });
+
+        msg.style.color = "green";
+        msg.textContent = "Thank you for your review!";
+        document.getElementById('reviewForm').reset();
+        selectedRating = 0;
+        document.querySelectorAll('#starRating span').forEach(s => s.style.color = '#ccc');
+
+      } catch (error) {
+        console.error("Error submitting review:", error);
+        msg.style.color = "red";
+        msg.textContent = "Error submitting review.";
       }
     });
-    loginEmail.addEventListener('keyup', (e) => {
-      if (e.key === 'Enter') {
-        loginSubmitBtn.click();
-      }
-    });
+        
+    function loadReviews(user) {
+      const container = document.getElementById('reviewsContainer');
+      container.innerHTML = "<p>Loading reviews...</p>";
+
+      db.collection('reviews').orderBy('timestamp', 'desc').limit(50).get()
+      .then(snapshot => {
+        if (snapshot.empty) {
+          container.innerHTML = "<p>No reviews yet.</p>";
+          return;
+        }
+
+        let html = '';
+        snapshot.forEach(doc => {
+          const r = doc.data();
+          const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+
+          html += `<div class="entry" style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+            <strong>${r.name}</strong> &nbsp; <span style="color:#f39c12; font-size:1.2em;">${stars}</span>
+            <p>${r.comment}</p>
+          </div>`;
+        });
+        container.innerHTML = html;
+      })
+      .catch(err => {
+        container.innerHTML = `<p>Error loading reviews: ${err.message}</p>`;
+      });
+    }
+
+    // On page load, show default content
+    window.onload = () => {
+      showSection('default-content');
+    }
   </script>
-
 </body>
 </html>
