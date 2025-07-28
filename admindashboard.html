@@ -6,96 +6,128 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <style>
+    :root {
+      --primary: #3498db;
+      --primary-dark: #2980b9;
+      --background: #f4f7fa;
+      --card-bg: #ffffff;
+      --text: #2c3e50;
+      --muted: #7f8c8d;
+      --border: #e0e0e0;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      padding: 40px;
-      background: #f9fafb;
-      color: #333;
+      margin: 0;
+      padding: 40px 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--background);
+      color: var(--text);
     }
+
     #admin-section {
-      max-width: 600px;
+      max-width: 700px;
       margin: auto;
-      background: white;
+      background: var(--card-bg);
       padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.05);
     }
+
     h2 {
-      margin-bottom: 20px;
       text-align: center;
-      color: #2c3e50;
+      color: var(--text);
+      margin-bottom: 25px;
     }
+
     label {
-      font-weight: bold;
-      margin-top: 15px;
       display: block;
-      color: #34495e;
+      margin-top: 15px;
+      font-weight: 600;
+      color: var(--text);
     }
-    select, textarea, input[type="url"] {
-      margin-top: 5px;
+
+    select {
+      margin-top: 8px;
       padding: 10px;
       width: 100%;
-      box-sizing: border-box;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
       font-size: 1rem;
-      transition: border-color 0.3s;
-    }
-    select:focus, input[type="url"]:focus, textarea:focus {
-      border-color: #3498db;
       outline: none;
     }
-    textarea {
-      resize: vertical;
-      min-height: 80px;
-      font-family: inherit;
-      font-size: 1rem;
-    }
-    button {
-      margin-top: 20px;
-      padding: 12px;
-      width: 100%;
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: white;
-      background-color: #3498db;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    button:disabled {
-      background-color: #95a5a6;
-      cursor: not-allowed;
-    }
-    button:hover:not(:disabled) {
-      background-color: #2980b9;
-    }
-    #status {
-      margin-top: 15px;
-      min-height: 20px;
-      font-weight: bold;
-      text-align: center;
-    }
-    .entry-block {
-      margin-bottom: 30px;
-    }
-    .entry-block img {
+
+    textarea,
+    input[type="url"] {
       margin-top: 10px;
+      padding: 10px;
+      width: 100%;
+      font-size: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      box-sizing: border-box;
+      transition: border-color 0.3s ease;
+    }
+
+    textarea:focus,
+    input:focus,
+    select:focus {
+      border-color: var(--primary);
+    }
+
+    .entry-block {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      transition: box-shadow 0.2s;
+    }
+
+    .entry-block:hover {
+      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+    }
+
+    .entry-block img {
+      margin-top: 15px;
       max-width: 100%;
       max-height: 250px;
       border-radius: 6px;
-      box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .action-button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 100%;
+    }
+
+    .action-button:hover {
+      background-color: var(--primary-dark);
+    }
+
+    #status {
+      margin-top: 15px;
+      font-weight: bold;
+      text-align: center;
     }
   </style>
 </head>
 <body>
 
-<div id="admin-section" role="main" aria-label="Admin Section Update">
+<div id="admin-section">
   <h2>Update Section</h2>
 
   <label for="section-select">Select Section:</label>
-  <select id="section-select" aria-required="true" aria-describedby="status">
+  <select id="section-select">
     <option value="default-content">Default Welcome</option>
     <option value="res-exterior">Residential - Exterior</option>
     <option value="res-interior">Residential - Interior</option>
@@ -106,8 +138,8 @@
 
   <div id="entries-container"></div>
 
-  <button type="button" onclick="addEntry()" aria-label="Add new entry">➕ Add Image & Description</button>
-  <button id="save-btn" onclick="saveSection()">Save Section</button>
+  <button class="action-button" type="button" onclick="addEntry()">➕ Add Image & Description</button>
+  <button class="action-button" id="save-btn" onclick="saveSection()">💾 Save Section</button>
   <p id="status" role="status" aria-live="polite"></p>
 </div>
 
@@ -137,12 +169,12 @@
     entryDiv.classList.add('entry-block');
 
     const desc = document.createElement('textarea');
-    desc.placeholder = 'Enter description';
+    desc.placeholder = 'Enter description...';
     desc.value = description;
 
     const imgInput = document.createElement('input');
     imgInput.type = 'url';
-    imgInput.placeholder = 'Paste image URL';
+    imgInput.placeholder = 'Paste image URL (e.g. Imgur or Firebase)';
     imgInput.value = image;
 
     const imgPreview = document.createElement('img');
@@ -155,8 +187,8 @@
         imgPreview.src = url;
         imgPreview.style.display = 'block';
       } else {
-        imgPreview.style.display = 'none';
         imgPreview.src = '';
+        imgPreview.style.display = 'none';
       }
     });
 
@@ -190,7 +222,7 @@
         status.textContent = '';
       } else {
         status.textContent = 'No saved data for this section yet.';
-        createEntryBlock(); // blank
+        createEntryBlock();
       }
     } catch (error) {
       status.style.color = 'red';
