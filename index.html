@@ -134,42 +134,66 @@
     }
 
     .content {
-  width: 98%;
-  margin: 0 auto;
-  padding: 4px;
-  text-align: center;
-  box-sizing: border-box;
-}
+      width: 98%;
+      margin: 0 auto;
+      padding: 4px;
+      text-align: center;
+      box-sizing: border-box;
+    }
 
     .entry {
-  margin-bottom: 30px;
-  background: #fff;
-  padding: 5px;
-  border-radius: 8px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-  text-align: left;
-}
+      margin-bottom: 30px;
+      background: #fff;
+      padding: 5px;
+      border-radius: 8px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      text-align: left;
+    }
 
-.entry img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 6px;
-  margin-bottom: 12px;
-  display: block;
-}
+    /* New wrapper for image + header overlay */
+    .image-header-wrapper {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      border-radius: 6px;
+      overflow: hidden;
+    }
 
-.entry p {
-  font-size: 1.1em;
-  color: #333;
-  margin: 0;
-  white-space: pre-wrap; /* preserve line breaks */
-}
+    .image-header-wrapper img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+    }
+
+    .image-header-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-weight: 700;
+      font-size: 1.4em;
+      text-shadow: 0 0 5px rgba(0,0,0,0.7);
+      pointer-events: none;
+      text-align: center;
+      padding: 0 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .entry p {
+      font-size: 1.1em;
+      color: #333;
+      margin: 0;
+      white-space: pre-wrap; /* preserve line breaks */
+    }
 
     .entry h3 {
-  margin: 0 0 8px;
-  color: #2c3e50;
-  font-weight: 700;
-}
+      margin: 0 0 8px;
+      color: #2c3e50;
+      font-weight: 700;
+    }
 
     /* Login modal styles - fixed */
     #login-modal {
@@ -338,50 +362,53 @@
     }
 
     async function loadSectionContent(sectionId) {
-  const box = document.querySelector(`#${sectionId} .content-box`);
-  const docRef = db.collection('sections').doc(sectionId);
+      const box = document.querySelector(`#${sectionId} .content-box`);
+      const docRef = db.collection('sections').doc(sectionId);
 
-  try {
-    const doc = await docRef.get();
+      try {
+        const doc = await docRef.get();
 
-    if (doc.exists) {
-      const data = doc.data();
+        if (doc.exists) {
+          const data = doc.data();
 
-      const entries = data.entries || 
-                      ((data.description || data.image) ? [{ description: data.description || '', image: data.image || null }] : []);
+          const entries = data.entries || 
+                          ((data.description || data.image) ? [{ description: data.description || '', image: data.image || null }] : []);
 
-      if (entries.length === 0) {
-        box.innerHTML = `<p>No content available for this section.</p>`;
-        return;
-      }
+          if (entries.length === 0) {
+            box.innerHTML = `<p>No content available for this section.</p>`;
+            return;
+          }
 
-      let html = '';
-      if (sectionId !== 'default-content') {
-        html += `<h2>${formatTitle(sectionId)}</h2>`;
-      }
+          let html = '';
+          if (sectionId !== 'default-content') {
+            html += `<h2>${formatTitle(sectionId)}</h2>`;
+          }
 
-      entries.forEach((entry, idx) => {
-        html += '<div class="entry">';
-        if (entry.image) {
-          html += `<img src="${entry.image}" alt="${formatTitle(sectionId)} Image ${idx + 1}" />`;
+          entries.forEach((entry, idx) => {
+            html += '<div class="entry">';
+            if (entry.image) {
+              html += `
+                <div class="image-header-wrapper">
+                  <img src="${entry.image}" alt="${formatTitle(sectionId)} Image ${idx + 1}" />
+                  ${entry.header ? `<div class="image-header-text">${entry.header}</div>` : ''}
+                </div>`;
+            } else if (entry.header) {
+              html += `<h3>${entry.header}</h3>`;
+            }
+            html += `<p>${entry.description || '[No description]'}</p>`;
+            html += '</div>';
+          });
+
+          box.innerHTML = html;
+
+        } else {
+          box.innerHTML = `<p>No content available for this section.</p>`;
         }
-        if (entry.header) {
-          html += `<h3>${entry.header}</h3>`;
-        }
-        html += `<p>${entry.description || '[No description]'}</p>`;
-        html += '</div>';
-      });
-
-      box.innerHTML = html;
-
-    } else {
-      box.innerHTML = `<p>No content available for this section.</p>`;
+      } catch (error) {
+        console.error("Error loading section:", error);
+        box.innerHTML = `<p>Failed to load content: ${error.message}</p>`;
+      }
     }
-  } catch (error) {
-    console.error("Error loading section:", error);
-    box.innerHTML = `<p>Failed to load content: ${error.message}</p>`;
-  }
-}
 
     function formatTitle(id) {
       // Capitalize each word, replace dashes with spaces
