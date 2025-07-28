@@ -36,7 +36,7 @@
   </div>
 
   <script>
-   const firebaseConfig = {
+  const firebaseConfig = {
   apiKey: "AIzaSyBtndRroVa279cpMzQlIiphU1W9Uw_Yg6U",
   authDomain: "kravin-delivery.firebaseapp.com",
   databaseURL: "https://kravin-delivery-default-rtdb.firebaseio.com",
@@ -46,38 +46,38 @@
   appId: "1:862159900289:web:18797ef8343e6329cb0780"
 };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
-    async function saveSection() {
-      const sectionId = document.getElementById('section-select').value;
-      const description = document.getElementById('description').value.trim();
-      const imageURL = document.getElementById('image-url').value.trim();
-      const status = document.getElementById('status');
+  async function saveSection() {
+    const sectionId = document.getElementById('section-select').value;
+    const description = document.getElementById('description').value.trim();
+    const imageURL = document.getElementById('image-url').value.trim();
+    const status = document.getElementById('status');
 
-      if (!description) {
-        status.style.color = 'red';
-        status.textContent = 'Description cannot be empty.';
-        return;
-      }
-
-      status.style.color = 'black';
-      status.textContent = 'Saving...';
-
-      try {
-        const data = { description };
-        if (imageURL) data.image = imageURL;
-
-        await db.collection('sections').doc(sectionId).set(data, { merge: true });
-
-        status.style.color = 'green';
-        status.textContent = 'Section saved successfully!';
-      } catch (error) {
-        console.error('Save failed:', error);
-        status.style.color = 'red';
-        status.textContent = 'Failed to save section.';
-      }
+    if (!description) {
+      status.style.color = 'red';
+      status.textContent = 'Description cannot be empty.';
+      return;
     }
-  </script>
+
+    status.style.color = 'black';
+    status.textContent = 'Saving...';
+
+    try {
+      const data = { description };
+      if (imageURL) data.image = imageURL;
+
+      await db.collection('sections').doc(sectionId).set(data, { merge: true });
+
+      status.style.color = 'green';
+      status.textContent = 'Section saved successfully!';
+    } catch (error) {
+      status.style.color = 'red';
+      status.textContent = 'ERROR: ' + error.message;
+    }
+  }
+</script>
+
 </body>
 </html>
