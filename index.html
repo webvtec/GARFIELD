@@ -148,16 +148,28 @@
       text-align: center;
     }
 
-    .content-box img {
-      max-width: 100%;
-      height: auto;
+    .entry {
+      margin-bottom: 30px;
+      background: #fff;
+      padding: 15px;
       border-radius: 8px;
-      margin-bottom: 20px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      text-align: left;
     }
 
-    .content-box p {
+    .entry img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .entry p {
       font-size: 1.1em;
       color: #333;
+      margin: 0;
+      white-space: pre-wrap; /* preserve line breaks */
     }
 
     /* Login modal styles - fixed */
@@ -262,26 +274,25 @@
   <div class="content" id="com-interior" style="display: none;"><div class="content-box"></div></div>
   <div class="content" id="line-painting" style="display: none;"><div class="content-box"></div></div>
 
-
   <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
   <!-- Firebase Setup -->
   <script>
   const firebaseConfig = {
-  apiKey: "AIzaSyBtndRroVa279cpMzQlIiphU1W9Uw_Yg6U",
-  authDomain: "kravin-delivery.firebaseapp.com",
-  databaseURL: "https://kravin-delivery-default-rtdb.firebaseio.com",
-  projectId: "kravin-delivery",
-  storageBucket: "kravin-delivery.firebasestorage.app",
-  messagingSenderId: "862159900289",
-  appId: "1:862159900289:web:18797ef8343e6329cb0780"
-};
+    apiKey: "AIzaSyBtndRroVa279cpMzQlIiphU1W9Uw_Yg6U",
+    authDomain: "kravin-delivery.firebaseapp.com",
+    databaseURL: "https://kravin-delivery-default-rtdb.firebaseio.com",
+    projectId: "kravin-delivery",
+    storageBucket: "kravin-delivery.firebasestorage.app",
+    messagingSenderId: "862159900289",
+    appId: "1:862159900289:web:18797ef8343e6329cb0780"
+  };
 
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
-</script>
+  </script>
 
   <!-- Main JavaScript -->
   <script>
@@ -294,21 +305,21 @@
     });
 
     document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
-  toggle.addEventListener('click', e => {
-    e.preventDefault();
-    e.stopPropagation();
-    const submenu = document.getElementById(toggle.dataset.submenu);
-    if (!submenu) return;
+      toggle.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        const submenu = document.getElementById(toggle.dataset.submenu);
+        if (!submenu) return;
 
-    const isVisible = submenu.style.display === 'block';
+        const isVisible = submenu.style.display === 'block';
 
-    // Hide all dropdowns first
-    document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
+        // Hide all dropdowns first
+        document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
 
-    // Toggle current submenu
-    submenu.style.display = isVisible ? 'none' : 'block';
-  });
-});
+        // Toggle current submenu
+        submenu.style.display = isVisible ? 'none' : 'block';
+      });
+    });
 
     document.addEventListener('click', e => {
       if (!menu.contains(e.target) && e.target !== menuBtn) {
@@ -328,33 +339,52 @@
     }
 
     async function loadSectionContent(sectionId) {
-  const box = document.querySelector(`#${sectionId} .content-box`);
-  const docRef = db.collection('sections').doc(sectionId);
-  
-  try {
-    const doc = await docRef.get();
+      const box = document.querySelector(`#${sectionId} .content-box`);
+      const docRef = db.collection('sections').doc(sectionId);
 
-    if (doc.exists) {
-      const data = doc.data();
-      console.log("Loaded data for", sectionId, data);
+      try {
+        const doc = await docRef.get();
 
-      box.innerHTML = `
-        ${sectionId !== 'default-content' ? `<h2>${formatTitle(sectionId)}</h2>` : ''}
-        ${data.image ? `<img src="${data.image}" alt="${formatTitle(sectionId)}" />` : '<p>[No Image]</p>'}
-        <p>${data.description || '[No Description]'}</p>
-      `;
-    } else {
-      console.log("No document exists for", sectionId);
-      box.innerHTML = `<p>No content available for this section.</p>`;
+        if (doc.exists) {
+          const data = doc.data();
+
+          // Use the entries array, or fallback to a single entry for backward compatibility
+          const entries = data.entries || 
+                          ((data.description || data.image) ? [{ description: data.description || '', image: data.image || null }] : []);
+
+          if (entries.length === 0) {
+            box.innerHTML = `<p>No content available for this section.</p>`;
+            return;
+          }
+
+          let html = '';
+          if (sectionId !== 'default-content') {
+            html += `<h2>${formatTitle(sectionId)}</h2>`;
+          }
+
+          entries.forEach((entry, idx) => {
+            html += '<div class="entry">';
+            if (entry.image) {
+              html += `<img src="${entry.image}" alt="${formatTitle(sectionId)} Image ${idx + 1}" />`;
+            }
+            html += `<p>${entry.description || '[No description]'}</p>`;
+            html += '</div>';
+          });
+
+          box.innerHTML = html;
+
+        } else {
+          box.innerHTML = `<p>No content available for this section.</p>`;
+        }
+      } catch (error) {
+        console.error("Error loading section:", error);
+        box.innerHTML = `<p>Failed to load content: ${error.message}</p>`;
+      }
     }
-  } catch (error) {
-    console.error("Error loading section:", error);
-    box.innerHTML = `<p>Failed to load content: ${error.message}</p>`;
-  }
-}
 
     function formatTitle(id) {
-      return id.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase());
+      // Capitalize each word, replace dashes with spaces
+      return id.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
     }
 
     window.addEventListener('DOMContentLoaded', () => {
