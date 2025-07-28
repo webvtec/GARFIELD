@@ -222,42 +222,42 @@
     }
 
     async function saveEntry() {
-      const sectionId = sectionSelect.value;
-      const description = descriptionInput.value.trim();
-      const image = imageUrlInput.value.trim();
+  const sectionId = sectionSelect.value;
+  const description = descriptionInput.value.trim();
+  const image = imageUrlInput.value.trim();
 
-      if (!description) {
-        status.textContent = 'Description cannot be empty.';
-        status.style.color = 'red';
-        return;
-      }
+  if (!description) {
+    status.textContent = 'Description cannot be empty.';
+    status.style.color = 'red';
+    return;
+  }
 
-      saveBtn.disabled = true;
-      status.textContent = 'Saving...';
-      status.style.color = 'black';
+  saveBtn.disabled = true;
+  status.textContent = 'Saving...';
+  status.style.color = 'black';
 
-      const newEntry = {
-        description,
-        image: image || null,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      };
+  const newEntry = {
+    description,
+    image: image || null,
+    timestamp: new Date().toISOString() // client-side timestamp
+  };
 
-      try {
-        await db.collection('sections').doc(sectionId).set({
-          entries: firebase.firestore.FieldValue.arrayUnion(newEntry)
-        }, { merge: true });
+  try {
+    await db.collection('sections').doc(sectionId).set({
+      entries: firebase.firestore.FieldValue.arrayUnion(newEntry)
+    }, { merge: true });
 
-        status.textContent = 'Entry saved!';
-        status.style.color = 'green';
-        addNewEntry(); // clear form
-        loadSection(); // reload entries
-      } catch (err) {
-        status.textContent = 'Error saving: ' + err.message;
-        status.style.color = 'red';
-      } finally {
-        saveBtn.disabled = false;
-      }
-    }
+    status.textContent = 'Entry saved!';
+    status.style.color = 'green';
+    addNewEntry(); // clear form
+    loadSection(); // reload entries
+  } catch (err) {
+    status.textContent = 'Error saving: ' + err.message;
+    status.style.color = 'red';
+  } finally {
+    saveBtn.disabled = false;
+  }
+}
 
     window.onload = loadSection;
   </script>
