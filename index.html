@@ -279,6 +279,7 @@
 
     <nav id="menu" role="navigation" aria-label="Main Menu">
       <ul>
+        <li><a href="#" onclick="loadHome()">🏠 HOME</a></li>
         <li class="has-dropdown">
           <a href="#" class="dropdown-toggle" data-submenu="residential-submenu">Residential Painting</a>
           <ul id="residential-submenu" class="dropdown" aria-label="Residential submenu">
@@ -301,6 +302,7 @@
   </div>
 
   <!-- Dynamic Sections (initially empty) -->
+  <div id="homeSection" class="content-section" style="display:block;">
   <div class="content" id="default-content"><div class="content-box"></div></div>
   <div class="content" id="res-exterior" style="display: none;"><div class="content-box"></div></div>
   <div class="content" id="res-interior" style="display: none;"><div class="content-box"></div></div>
@@ -405,6 +407,25 @@ document.querySelectorAll('#menu a').forEach(link => {
   });
 });
 
+    <script>
+function loadHome() {
+  // Hide all other sections
+  const sections = document.querySelectorAll('.content-section');
+  sections.forEach(sec => sec.style.display = 'none');
+
+  // Show default landing section (adjust the ID to your real landing section)
+  const homeSection = document.getElementById('homeSection');
+  if (homeSection) {
+    homeSection.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Optionally close sidebar if you're using a mobile menu
+  const menu = document.getElementById('menu');
+  if (menu) {
+    menu.style.display = 'none';
+  }
+}
 
     function showSection(sectionId) {
       const allSections = ['default-content', 'res-exterior', 'res-interior', 'com-exterior', 'com-interior', 'line-painting', 'reviewsSection'];
