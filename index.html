@@ -387,7 +387,6 @@
     <input type="password" id="login-password" placeholder="Password" style="width:100%; padding:10px; margin-bottom:10px; border-radius:6px; border:1px solid #ccc;">
     <div id="login-error" style="color:red; min-height:20px; margin-bottom:10px;"></div>
     <button id="login-submit" style="width:100%; padding:12px; background:#177FB9; color:#fff; border:none; border-radius:6px; cursor:pointer;">Login</button>
-    <button id="login-cancel" style="width:100%; padding:12px; margin-top:10px; background:#ccc; border:none; border-radius:6px; cursor:pointer;">Cancel</button>
   </div>
 </div>
 
@@ -665,7 +664,10 @@ const loginEmail = document.getElementById('login-email');
 const loginPassword = document.getElementById('login-password');
 const loginError = document.getElementById('login-error');
 const loginSubmit = document.getElementById('login-submit');
-const loginCancel = document.getElementById('login-cancel');
+
+// Hardcoded allowed credentials (change these)
+const allowedEmail = 'carlanviroberts@gmail.com';
+const allowedPassword = '@Carlanvi321';
 
 // Show login modal on admin button click
 adminBtn.addEventListener('click', e => {
@@ -677,13 +679,8 @@ adminBtn.addEventListener('click', e => {
   loginEmail.focus();
 });
 
-// Cancel button hides modal
-loginCancel.addEventListener('click', () => {
-  loginModal.style.display = 'none';
-});
-
 // Submit login
-loginSubmit.addEventListener('click', async () => {
+loginSubmit.addEventListener('click', () => {
   const email = loginEmail.value.trim();
   const password = loginPassword.value;
 
@@ -692,25 +689,22 @@ loginSubmit.addEventListener('click', async () => {
     return;
   }
 
-  loginError.textContent = 'Logging in...';
-
-  try {
-    await firebase.auth().signInWithEmailAndPassword(email, password);
+  if (email === allowedEmail && password === allowedPassword) {
     loginError.textContent = '';
     loginModal.style.display = 'none';
-    // Redirect to admin dashboard after successful login
-    window.location.href = 'admin-dashboard.html';
-  } catch (err) {
-    loginError.textContent = 'Login failed: ' + err.message;
+    window.location.href = 'admindashboard.html';
+  } else {
+    loginError.textContent = 'Incorrect email or password.';
   }
 });
 
-// Optional: Close modal if user clicks outside the modal content
+// Close modal if user clicks outside the modal content
 loginModal.addEventListener('click', e => {
   if (e.target === loginModal) {
     loginModal.style.display = 'none';
   }
 });
+
 
   </script>
 </body>
