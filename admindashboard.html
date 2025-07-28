@@ -2,121 +2,118 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin Dashboard - Multi Entries</title>
+  <title>Admin Dashboard</title>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
+    body {
       font-family: Arial, sans-serif;
+      padding: 40px;
       background: #f9fafb;
-      overflow-y: auto;
+      color: #333;
     }
-
-    #admin-container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 30px 20px 60px;
+    #admin-section {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
     }
-
-    h1 {
+    h2 {
+      margin-bottom: 20px;
       text-align: center;
-      margin-bottom: 40px;
       color: #2c3e50;
     }
-
-    .section-block {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      margin-bottom: 40px;
-    }
-
-    .section-block h2 {
-      margin-top: 0;
+    label {
+      font-weight: bold;
+      margin-top: 15px;
+      display: block;
       color: #34495e;
     }
-
-    .entry {
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      padding: 15px;
-      margin-top: 20px;
-      background: #fefefe;
-      position: relative;
-    }
-
-    .entry textarea, .entry input[type="url"] {
-      width: 100%;
-      box-sizing: border-box;
+    select, input[type="url"], textarea {
+      margin-top: 5px;
       padding: 10px;
-      font-size: 1rem;
-      margin-top: 8px;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
       border: 1px solid #ccc;
       border-radius: 4px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
     }
-
-    .entry img {
+    select:focus, input[type="url"]:focus, textarea:focus {
+      border-color: #3498db;
+      outline: none;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px;
+      width: 100%;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: white;
+      background-color: #3498db;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:disabled {
+      background-color: #95a5a6;
+      cursor: not-allowed;
+    }
+    button:hover:not(:disabled) {
+      background-color: #2980b9;
+    }
+    #status {
+      margin-top: 15px;
+      min-height: 20px;
+      font-weight: bold;
+      text-align: center;
+    }
+    #image-preview {
+      margin-top: 15px;
       max-width: 100%;
       max-height: 250px;
-      margin-top: 10px;
-      display: block;
-    }
-
-    .entry-actions {
-      margin-top: 10px;
-    }
-
-    .entry-actions button {
-      margin-right: 10px;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 4px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .save-btn {
-      background: #3498db;
-      color: white;
-    }
-
-    .delete-btn {
-      background: #e74c3c;
-      color: white;
-    }
-
-    .add-entry-btn {
-      margin-top: 15px;
-      background: #2ecc71;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .status-msg {
-      font-weight: bold;
-      margin-top: 10px;
-    }
-
-    .status-success {
-      color: green;
-    }
-
-    .status-error {
-      color: red;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+      display: none;
+      object-fit: contain;
     }
   </style>
 </head>
 <body>
 
-  <div id="admin-container">
-    <h1>Admin Dashboard - Edit Sections</h1>
+  <div id="admin-section" role="main" aria-label="Admin Section Update">
+    <h2>Update Section</h2>
+
+    <label for="section-select">Select Section:</label>
+    <select id="section-select" aria-required="true" aria-describedby="status">
+      <option value="default-content">Default Welcome</option>
+      <option value="res-exterior">Residential - Exterior</option>
+      <option value="res-interior">Residential - Interior</option>
+      <option value="com-exterior">Commercial - Exterior</option>
+      <option value="com-interior">Commercial - Interior</option>
+      <option value="line-painting">Line Painting</option>
+    </select>
+
+    <label for="description">Description:</label>
+    <textarea id="description" placeholder="Enter description here..." required></textarea>
+
+    <label for="image-url">Image URL (optional):</label>
+    <input type="url" id="image-url" placeholder="Paste public image URL (e.g. Imgur or Firebase)" />
+
+    <img id="image-preview" alt="Preview of selected image" />
+
+    <button id="save-btn" onclick="saveSection()">Save Section</button>
+    <p id="status" role="status" aria-live="polite"></p>
   </div>
 
   <script>
@@ -132,154 +129,99 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    const sections = [
-      { id: "default-content", name: "Default Welcome" },
-      { id: "res-exterior", name: "Residential - Exterior" },
-      { id: "res-interior", name: "Residential - Interior" },
-      { id: "com-exterior", name: "Commercial - Exterior" },
-      { id: "com-interior", name: "Commercial - Interior" },
-      { id: "line-painting", name: "Line Painting" }
-    ];
+    const sectionSelect = document.getElementById('section-select');
+    const descriptionInput = document.getElementById('description');
+    const imageUrlInput = document.getElementById('image-url');
+    const imagePreview = document.getElementById('image-preview');
+    const status = document.getElementById('status');
+    const saveBtn = document.getElementById('save-btn');
 
-    const container = document.getElementById('admin-container');
+    // Load section data when selection changes
+    sectionSelect.addEventListener('change', loadSection);
 
-    function createUniqueId() {
-      return '_' + Math.random().toString(36).substr(2, 9);
-    }
-
-    async function loadSections() {
-      for (const section of sections) {
-        const secDiv = document.createElement('div');
-        secDiv.className = 'section-block';
-        const h2 = document.createElement('h2');
-        h2.textContent = section.name;
-
-        const status = document.createElement('div');
-        status.className = 'status-msg';
-
-        const entriesDiv = document.createElement('div');
-
-        const addBtn = document.createElement('button');
-        addBtn.textContent = 'Add New Entry';
-        addBtn.className = 'add-entry-btn';
-        addBtn.onclick = () => {
-          const newEntry = { id: createUniqueId(), description: '', image: '' };
-          renderEntry(section.id, entriesDiv, newEntry, status);
-        };
-
-        secDiv.appendChild(h2);
-        secDiv.appendChild(entriesDiv);
-        secDiv.appendChild(addBtn);
-        secDiv.appendChild(status);
-        container.appendChild(secDiv);
-
-        try {
-          const doc = await db.collection('sections').doc(section.id).get();
-          const data = doc.exists ? doc.data() : {};
-          const entries = data.entries || [];
-
-          entries.forEach(entry => {
-            renderEntry(section.id, entriesDiv, entry, status);
-          });
-        } catch (error) {
-          status.textContent = 'Error loading section.';
-          status.className = 'status-msg status-error';
-        }
+    // Show image preview when image URL changes
+    imageUrlInput.addEventListener('input', () => {
+      const url = imageUrlInput.value.trim();
+      if (url) {
+        imagePreview.src = url;
+        imagePreview.style.display = 'block';
+      } else {
+        imagePreview.style.display = 'none';
+        imagePreview.src = '';
       }
-    }
+    });
 
-    function renderEntry(sectionId, container, entry, statusBox) {
-      const div = document.createElement('div');
-      div.className = 'entry';
+    async function loadSection() {
+      const sectionId = sectionSelect.value;
+      status.style.color = 'black';
+      status.textContent = 'Loading section data...';
+      saveBtn.disabled = true;
 
-      const desc = document.createElement('textarea');
-      desc.placeholder = 'Description...';
-      desc.value = entry.description || '';
-
-      const imgInput = document.createElement('input');
-      imgInput.type = 'url';
-      imgInput.placeholder = 'Image URL...';
-      imgInput.value = entry.image || '';
-
-      const imgPreview = document.createElement('img');
-      if (entry.image) {
-        imgPreview.src = entry.image;
-      }
-
-      imgInput.addEventListener('input', () => {
-        imgPreview.src = imgInput.value.trim();
-      });
-
-      const actions = document.createElement('div');
-      actions.className = 'entry-actions';
-
-      const saveBtn = document.createElement('button');
-      saveBtn.textContent = 'Save';
-      saveBtn.className = 'save-btn';
-
-      const deleteBtn = document.createElement('button');
-      deleteBtn.textContent = 'Delete';
-      deleteBtn.className = 'delete-btn';
-
-      actions.appendChild(saveBtn);
-      actions.appendChild(deleteBtn);
-
-      saveBtn.onclick = async () => {
-        const updatedEntry = {
-          id: entry.id || createUniqueId(),
-          description: desc.value.trim(),
-          image: imgInput.value.trim()
-        };
-
-        try {
-          const ref = db.collection('sections').doc(sectionId);
-          const doc = await ref.get();
-          let entries = doc.exists && doc.data().entries ? doc.data().entries : [];
-
-          const index = entries.findIndex(e => e.id === updatedEntry.id);
-          if (index !== -1) {
-            entries[index] = updatedEntry;
+      try {
+        const doc = await db.collection('sections').doc(sectionId).get();
+        if (doc.exists) {
+          const data = doc.data();
+          descriptionInput.value = data.description || '';
+          imageUrlInput.value = data.image || '';
+          if (data.image) {
+            imagePreview.src = data.image;
+            imagePreview.style.display = 'block';
           } else {
-            entries.push(updatedEntry);
+            imagePreview.style.display = 'none';
+            imagePreview.src = '';
           }
-
-          await ref.set({ entries }, { merge: true });
-
-          statusBox.textContent = 'Saved!';
-          statusBox.className = 'status-msg status-success';
-        } catch (err) {
-          statusBox.textContent = 'Error saving entry.';
-          statusBox.className = 'status-msg status-error';
+          status.textContent = '';
+        } else {
+          // No data for this section yet
+          descriptionInput.value = '';
+          imageUrlInput.value = '';
+          imagePreview.style.display = 'none';
+          imagePreview.src = '';
+          status.textContent = 'No saved data for this section yet.';
         }
-      };
-
-      deleteBtn.onclick = async () => {
-        try {
-          const ref = db.collection('sections').doc(sectionId);
-          const doc = await ref.get();
-          let entries = doc.exists && doc.data().entries ? doc.data().entries : [];
-
-          entries = entries.filter(e => e.id !== entry.id);
-
-          await ref.set({ entries }, { merge: true });
-
-          container.removeChild(div);
-          statusBox.textContent = 'Entry deleted.';
-          statusBox.className = 'status-msg status-success';
-        } catch (err) {
-          statusBox.textContent = 'Error deleting entry.';
-          statusBox.className = 'status-msg status-error';
-        }
-      };
-
-      div.appendChild(desc);
-      div.appendChild(imgInput);
-      div.appendChild(imgPreview);
-      div.appendChild(actions);
-      container.appendChild(div);
+      } catch (error) {
+        status.style.color = 'red';
+        status.textContent = 'ERROR loading section: ' + error.message;
+      } finally {
+        saveBtn.disabled = false;
+      }
     }
 
-    window.onload = loadSections;
+    async function saveSection() {
+      const sectionId = sectionSelect.value;
+      const description = descriptionInput.value.trim();
+      const imageURL = imageUrlInput.value.trim();
+
+      if (!description) {
+        status.style.color = 'red';
+        status.textContent = 'Description cannot be empty.';
+        return;
+      }
+
+      saveBtn.disabled = true;
+      status.style.color = 'black';
+      status.textContent = 'Saving...';
+
+      try {
+        const data = { description };
+        if (imageURL) data.image = imageURL;
+        else data.image = firebase.firestore.FieldValue.delete();
+
+        await db.collection('sections').doc(sectionId).set(data, { merge: true });
+
+        status.style.color = 'green';
+        status.textContent = 'Section saved successfully!';
+      } catch (error) {
+        status.style.color = 'red';
+        status.textContent = 'ERROR: ' + error.message;
+      } finally {
+        saveBtn.disabled = false;
+      }
+    }
+
+    // Load initial section on page load
+    window.onload = loadSection;
   </script>
+
 </body>
 </html>
