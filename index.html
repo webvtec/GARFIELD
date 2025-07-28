@@ -393,9 +393,11 @@ document.addEventListener('click', e => {
   }
 });
 
-// NEW: Hide menu and dropdowns when clicking any menu link
+// ✅ Updated: Only hide menu and dropdowns if it's not a dropdown-toggle
 document.querySelectorAll('#menu a').forEach(link => {
-  link.addEventListener('click', () => {
+  link.addEventListener('click', e => {
+    if (link.classList.contains('dropdown-toggle')) return;
+
     menu.style.display = 'none';
     document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
   });
