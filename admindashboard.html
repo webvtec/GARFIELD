@@ -104,6 +104,8 @@
       <option value="line-painting">Line Painting</option>
     </select>
 
+    <button type="button" onclick="addNewEntry()">Add New to This Section</button>
+
     <label for="description">Description:</label>
     <textarea id="description" placeholder="Enter description here..." required></textarea>
 
@@ -136,10 +138,8 @@
     const status = document.getElementById('status');
     const saveBtn = document.getElementById('save-btn');
 
-    // Load section data when selection changes
     sectionSelect.addEventListener('change', loadSection);
 
-    // Show image preview when image URL changes
     imageUrlInput.addEventListener('input', () => {
       const url = imageUrlInput.value.trim();
       if (url) {
@@ -172,7 +172,6 @@
           }
           status.textContent = '';
         } else {
-          // No data for this section yet
           descriptionInput.value = '';
           imageUrlInput.value = '';
           imagePreview.style.display = 'none';
@@ -219,7 +218,15 @@
       }
     }
 
-    // Load initial section on page load
+    function addNewEntry() {
+      descriptionInput.value = '';
+      imageUrlInput.value = '';
+      imagePreview.style.display = 'none';
+      imagePreview.src = '';
+      status.style.color = 'black';
+      status.textContent = 'Ready to add new entry to current section.';
+    }
+
     window.onload = loadSection;
   </script>
 
