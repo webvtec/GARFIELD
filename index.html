@@ -362,36 +362,45 @@
   <!-- Main JavaScript -->
   <script>
     const menuBtn = document.getElementById('menuBtn');
-    const menu = document.getElementById('menu');
+const menu = document.getElementById('menu');
 
-    menuBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
-    });
+menuBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+});
 
-    document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
-      toggle.addEventListener('click', e => {
-        e.preventDefault();
-        e.stopPropagation();
-        const submenu = document.getElementById(toggle.dataset.submenu);
-        if (!submenu) return;
+document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+  toggle.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    const submenu = document.getElementById(toggle.dataset.submenu);
+    if (!submenu) return;
 
-        const isVisible = submenu.style.display === 'block';
+    const isVisible = submenu.style.display === 'block';
 
-        // Hide all dropdowns first
-        document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
+    // Hide all dropdowns first
+    document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
 
-        // Toggle current submenu
-        submenu.style.display = isVisible ? 'none' : 'block';
-      });
-    });
+    // Toggle current submenu
+    submenu.style.display = isVisible ? 'none' : 'block';
+  });
+});
 
-    document.addEventListener('click', e => {
-      if (!menu.contains(e.target) && e.target !== menuBtn) {
-        menu.style.display = 'none';
-        document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
-      }
-    });
+document.addEventListener('click', e => {
+  if (!menu.contains(e.target) && e.target !== menuBtn) {
+    menu.style.display = 'none';
+    document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
+  }
+});
+
+// NEW: Hide menu and dropdowns when clicking any menu link
+document.querySelectorAll('#menu a').forEach(link => {
+  link.addEventListener('click', () => {
+    menu.style.display = 'none';
+    document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
+  });
+});
+
 
     function showSection(sectionId) {
       const allSections = ['default-content', 'res-exterior', 'res-interior', 'com-exterior', 'com-interior', 'line-painting', 'reviewsSection'];
