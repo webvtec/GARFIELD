@@ -533,32 +533,56 @@ document.getElementById('reviewForm').addEventListener('submit', async (e) => {
 
         
     function loadReviews(user) {
-      const container = document.getElementById('reviewsContainer');
-      container.innerHTML = "<p>Loading reviews...</p>";
+  const container = document.getElementById('reviewsContainer');
+  container.innerHTML = "<p>Loading reviews...</p>";
 
-      db.collection('reviews').orderBy('timestamp', 'desc').limit(50).get()
-      .then(snapshot => {
-        if (snapshot.empty) {
-          container.innerHTML = "<p>No reviews yet.</p>";
-          return;
-        }
-
-        let html = '';
-        snapshot.forEach(doc => {
-          const r = doc.data();
-          const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
-
-          html += `<div class="entry" style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
-            <strong>${r.name}</strong> &nbsp; <span style="color:#f39c12; font-size:1.2em;">${stars}</span>
-            <p>${r.comment}</p>
-          </div>`;
-        });
-        container.innerHTML = html;
-      })
-      .catch(err => {
-        container.innerHTML = `<p>Error loading reviews: ${err.message}</p>`;
-      });
+  db.collection('reviews').orderBy('timestamp', 'desc').limit(50).get()
+  .then(snapshot => {
+    if (snapshot.empty) {
+      container.innerHTML = "<p>No reviews yet.</p>";
+      return;
     }
+
+    let html = '';
+    snapshot.forEach(doc => {
+      const r = doc.data();
+      const reviewId = doc.id;
+      const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+
+      let deleteButtonHTML = '';
+      if (user && user.uid === r.uid) {
+        deleteButtonHTML = `<button 
+          style="float:right; background:none; border:none; color:red; font-weight:bold; cursor:pointer; font-size:1.2em;" 
+          title="Delete review" 
+          onclick="deleteReview('${reviewId}')">&times;</button>`;
+      }
+
+      html += `<div class="entry" style="border:1px solid #ccc; padding:10px; margin-bottom:10px; position: relative;">
+        ${deleteButtonHTML}
+        <strong>${r.name}</strong> &nbsp; <span style="color:#f39c12; font-size:1.2em;">${stars}</span>
+        <p>${r.comment}</p>
+      </div>`;
+    });
+    container.innerHTML = html;
+  })
+  .catch(err => {
+    container.innerHTML = `<p>Error loading reviews: ${err.message}</p>`;
+  });
+}
+
+function deleteReview(reviewId) {
+  if (!confirm("Are you sure you want to delete your review?")) {
+    return;
+  }
+  db.collection('reviews').doc(reviewId).delete()
+  .then(() => {
+    alert("Review deleted.");
+    loadReviews(auth.currentUser);
+  })
+  .catch(err => {
+    alert("Failed to delete review: " + err.message);
+  });
+}
 
     // On page load, show default content
     window.onload = () => {
