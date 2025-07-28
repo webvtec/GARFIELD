@@ -319,21 +319,30 @@
     }
 
     async function loadSectionContent(sectionId) {
-      const box = document.querySelector(`#${sectionId} .content-box`);
-      const docRef = db.collection('sections').doc(sectionId);
-      const doc = await docRef.get();
+  const box = document.querySelector(`#${sectionId} .content-box`);
+  const docRef = db.collection('sections').doc(sectionId);
+  
+  try {
+    const doc = await docRef.get();
 
-      if (doc.exists) {
-        const data = doc.data();
-        box.innerHTML = `
-          ${sectionId !== 'default-content' ? `<h2>${formatTitle(sectionId)}</h2>` : ''}
-          ${data.image ? `<img src="${data.image}" alt="${formatTitle(sectionId)}" />` : ''}
-          <p>${data.description || ''}</p>
-        `;
-      } else {
-        box.innerHTML = `<p>No content available.</p>`;
-      }
+    if (doc.exists) {
+      const data = doc.data();
+      console.log("Loaded data for", sectionId, data);
+
+      box.innerHTML = `
+        ${sectionId !== 'default-content' ? `<h2>${formatTitle(sectionId)}</h2>` : ''}
+        ${data.image ? `<img src="${data.image}" alt="${formatTitle(sectionId)}" />` : '<p>[No Image]</p>'}
+        <p>${data.description || '[No Description]'}</p>
+      `;
+    } else {
+      console.log("No document exists for", sectionId);
+      box.innerHTML = `<p>No content available for this section.</p>`;
     }
+  } catch (error) {
+    console.error("Error loading section:", error);
+    box.innerHTML = `<p>Failed to load content: ${error.message}</p>`;
+  }
+}
 
     function formatTitle(id) {
       return id.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase());
