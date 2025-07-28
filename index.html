@@ -294,15 +294,21 @@
     });
 
     document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
-      toggle.addEventListener('click', e => {
-        e.preventDefault();
-        e.stopPropagation();
-        const submenu = document.getElementById(toggle.dataset.submenu);
-        if (!submenu) return;
-        document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
-        submenu.style.display = 'block';
-      });
-    });
+  toggle.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    const submenu = document.getElementById(toggle.dataset.submenu);
+    if (!submenu) return;
+
+    const isVisible = submenu.style.display === 'block';
+
+    // Hide all dropdowns first
+    document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
+
+    // Toggle current submenu
+    submenu.style.display = isVisible ? 'none' : 'block';
+  });
+});
 
     document.addEventListener('click', e => {
       if (!menu.contains(e.target) && e.target !== menuBtn) {
