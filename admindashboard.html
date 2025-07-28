@@ -1,227 +1,240 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Admin Dashboard</title>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 40px;
-      background: #f9fafb;
-      color: #333;
-    }
-    #admin-section {
-      max-width: 500px;
-      margin: auto;
-      background: white;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
-    }
-    h2 {
-      margin-bottom: 20px;
-      text-align: center;
-      color: #2c3e50;
-    }
-    label {
-      font-weight: bold;
-      margin-top: 15px;
-      display: block;
-      color: #34495e;
-    }
-    select, input[type="url"], textarea {
-      margin-top: 5px;
-      padding: 10px;
-      width: 100%;
-      max-width: 100%;
-      box-sizing: border-box;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      font-size: 1rem;
-      transition: border-color 0.3s;
-    }
-    select:focus, input[type="url"]:focus, textarea:focus {
-      border-color: #3498db;
-      outline: none;
-    }
-    textarea {
-      resize: vertical;
-      min-height: 80px;
-      font-family: inherit;
-      font-size: 1rem;
-    }
-    button {
-      margin-top: 20px;
-      padding: 12px;
-      width: 100%;
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: white;
-      background-color: #3498db;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    button:disabled {
-      background-color: #95a5a6;
-      cursor: not-allowed;
-    }
-    button:hover:not(:disabled) {
-      background-color: #2980b9;
-    }
-    #status {
-      margin-top: 15px;
-      min-height: 20px;
-      font-weight: bold;
-      text-align: center;
-    }
-    #image-preview {
-      margin-top: 15px;
-      max-width: 100%;
-      max-height: 250px;
-      border-radius: 6px;
-      box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
-      display: none;
-      object-fit: contain;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard</title>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background: #f9fafb;
+      color: #333;
+    }
+    #admin-section {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
+    }
+    h2 {
+      margin-bottom: 20px;
+      text-align: center;
+      color: #2c3e50;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 15px;
+      display: block;
+      color: #34495e;
+    }
+    select, textarea, input[type="url"] {
+      margin-top: 5px;
+      padding: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+    select:focus, input[type="url"]:focus, textarea:focus {
+      border-color: #3498db;
+      outline: none;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px;
+      width: 100%;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: white;
+      background-color: #3498db;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:disabled {
+      background-color: #95a5a6;
+      cursor: not-allowed;
+    }
+    button:hover:not(:disabled) {
+      background-color: #2980b9;
+    }
+    #status {
+      margin-top: 15px;
+      min-height: 20px;
+      font-weight: bold;
+      text-align: center;
+    }
+    .entry-block {
+      margin-bottom: 30px;
+    }
+    .entry-block img {
+      margin-top: 10px;
+      max-width: 100%;
+      max-height: 250px;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+    }
+  </style>
 </head>
 <body>
 
-  <div id="admin-section" role="main" aria-label="Admin Section Update">
-    <h2>Update Section</h2>
+<div id="admin-section" role="main" aria-label="Admin Section Update">
+  <h2>Update Section</h2>
 
-    <label for="section-select">Select Section:</label>
-    <select id="section-select" aria-required="true" aria-describedby="status">
-      <option value="default-content">Default Welcome</option>
-      <option value="res-exterior">Residential - Exterior</option>
-      <option value="res-interior">Residential - Interior</option>
-      <option value="com-exterior">Commercial - Exterior</option>
-      <option value="com-interior">Commercial - Interior</option>
-      <option value="line-painting">Line Painting</option>
-    </select>
+  <label for="section-select">Select Section:</label>
+  <select id="section-select" aria-required="true" aria-describedby="status">
+    <option value="default-content">Default Welcome</option>
+    <option value="res-exterior">Residential - Exterior</option>
+    <option value="res-interior">Residential - Interior</option>
+    <option value="com-exterior">Commercial - Exterior</option>
+    <option value="com-interior">Commercial - Interior</option>
+    <option value="line-painting">Line Painting</option>
+  </select>
 
-    <label for="description">Description:</label>
-    <textarea id="description" placeholder="Enter description here..." required></textarea>
+  <div id="entries-container"></div>
 
-    <label for="image-url">Image URL (optional):</label>
-    <input type="url" id="image-url" placeholder="Paste public image URL (e.g. Imgur or Firebase)" />
+  <button type="button" onclick="addEntry()" aria-label="Add new entry">➕ Add Image & Description</button>
+  <button id="save-btn" onclick="saveSection()">Save Section</button>
+  <p id="status" role="status" aria-live="polite"></p>
+</div>
 
-    <img id="image-preview" alt="Preview of selected image" />
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBtndRroVa279cpMzQlIiphU1W9Uw_Yg6U",
+    authDomain: "kravin-delivery.firebaseapp.com",
+    projectId: "kravin-delivery",
+    storageBucket: "kravin-delivery.appspot.com",
+    messagingSenderId: "862159900289",
+    appId: "1:862159900289:web:18797ef8343e6329cb0780"
+  };
 
-    <button id="save-btn" onclick="saveSection()">Save Section</button>
-    <p id="status" role="status" aria-live="polite"></p>
-  </div>
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBtndRroVa279cpMzQlIiphU1W9Uw_Yg6U",
-      authDomain: "kravin-delivery.firebaseapp.com",
-      projectId: "kravin-delivery",
-      storageBucket: "kravin-delivery.appspot.com",
-      messagingSenderId: "862159900289",
-      appId: "1:862159900289:web:18797ef8343e6329cb0780"
-    };
+  const sectionSelect = document.getElementById('section-select');
+  const entriesContainer = document.getElementById('entries-container');
+  const status = document.getElementById('status');
+  const saveBtn = document.getElementById('save-btn');
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+  sectionSelect.addEventListener('change', loadSection);
+  window.onload = loadSection;
 
-    const sectionSelect = document.getElementById('section-select');
-    const descriptionInput = document.getElementById('description');
-    const imageUrlInput = document.getElementById('image-url');
-    const imagePreview = document.getElementById('image-preview');
-    const status = document.getElementById('status');
-    const saveBtn = document.getElementById('save-btn');
+  function createEntryBlock(description = '', image = '') {
+    const entryDiv = document.createElement('div');
+    entryDiv.classList.add('entry-block');
 
-    // Load section data when selection changes
-    sectionSelect.addEventListener('change', loadSection);
+    const desc = document.createElement('textarea');
+    desc.placeholder = 'Enter description';
+    desc.value = description;
 
-    // Show image preview when image URL changes
-    imageUrlInput.addEventListener('input', () => {
-      const url = imageUrlInput.value.trim();
-      if (url) {
-        imagePreview.src = url;
-        imagePreview.style.display = 'block';
-      } else {
-        imagePreview.style.display = 'none';
-        imagePreview.src = '';
-      }
-    });
+    const imgInput = document.createElement('input');
+    imgInput.type = 'url';
+    imgInput.placeholder = 'Paste image URL';
+    imgInput.value = image;
 
-    async function loadSection() {
-      const sectionId = sectionSelect.value;
-      status.style.color = 'black';
-      status.textContent = 'Loading section data...';
-      saveBtn.disabled = true;
+    const imgPreview = document.createElement('img');
+    imgPreview.style.display = image ? 'block' : 'none';
+    if (image) imgPreview.src = image;
 
-      try {
-        const doc = await db.collection('sections').doc(sectionId).get();
-        if (doc.exists) {
-          const data = doc.data();
-          descriptionInput.value = data.description || '';
-          imageUrlInput.value = data.image || '';
-          if (data.image) {
-            imagePreview.src = data.image;
-            imagePreview.style.display = 'block';
-          } else {
-            imagePreview.style.display = 'none';
-            imagePreview.src = '';
-          }
-          status.textContent = '';
-        } else {
-          // No data for this section yet
-          descriptionInput.value = '';
-          imageUrlInput.value = '';
-          imagePreview.style.display = 'none';
-          imagePreview.src = '';
-          status.textContent = 'No saved data for this section yet.';
-        }
-      } catch (error) {
-        status.style.color = 'red';
-        status.textContent = 'ERROR loading section: ' + error.message;
-      } finally {
-        saveBtn.disabled = false;
-      }
-    }
+    imgInput.addEventListener('input', () => {
+      const url = imgInput.value.trim();
+      if (url) {
+        imgPreview.src = url;
+        imgPreview.style.display = 'block';
+      } else {
+        imgPreview.style.display = 'none';
+        imgPreview.src = '';
+      }
+    });
 
-    async function saveSection() {
-      const sectionId = sectionSelect.value;
-      const description = descriptionInput.value.trim();
-      const imageURL = imageUrlInput.value.trim();
+    entryDiv.appendChild(desc);
+    entryDiv.appendChild(imgInput);
+    entryDiv.appendChild(imgPreview);
+    entriesContainer.appendChild(entryDiv);
+  }
 
-      if (!description) {
-        status.style.color = 'red';
-        status.textContent = 'Description cannot be empty.';
-        return;
-      }
+  function addEntry() {
+    createEntryBlock();
+  }
 
-      saveBtn.disabled = true;
-      status.style.color = 'black';
-      status.textContent = 'Saving...';
+  async function loadSection() {
+    const sectionId = sectionSelect.value;
+    status.style.color = 'black';
+    status.textContent = 'Loading section data...';
+    saveBtn.disabled = true;
+    entriesContainer.innerHTML = '';
 
-      try {
-        const data = { description };
-        if (imageURL) data.image = imageURL;
-        else data.image = firebase.firestore.FieldValue.delete();
+    try {
+      const doc = await db.collection('sections').doc(sectionId).get();
+      if (doc.exists) {
+        const data = doc.data();
+        const entries = Array.isArray(data.entries)
+          ? data.entries
+          : [{ description: data.description || '', image: data.image || '' }];
+        entries.forEach(entry => {
+          createEntryBlock(entry.description, entry.image);
+        });
+        status.textContent = '';
+      } else {
+        status.textContent = 'No saved data for this section yet.';
+        createEntryBlock(); // blank
+      }
+    } catch (error) {
+      status.style.color = 'red';
+      status.textContent = 'ERROR loading section: ' + error.message;
+    } finally {
+      saveBtn.disabled = false;
+    }
+  }
 
-        await db.collection('sections').doc(sectionId).set(data, { merge: true });
+  async function saveSection() {
+    const sectionId = sectionSelect.value;
+    const entryBlocks = entriesContainer.querySelectorAll('.entry-block');
 
-        status.style.color = 'green';
-        status.textContent = 'Section saved successfully!';
-      } catch (error) {
-        status.style.color = 'red';
-        status.textContent = 'ERROR: ' + error.message;
-      } finally {
-        saveBtn.disabled = false;
-      }
-    }
+    const entries = [];
+    entryBlocks.forEach(block => {
+      const desc = block.querySelector('textarea').value.trim();
+      const img = block.querySelector('input[type="url"]').value.trim();
+      if (desc || img) {
+        entries.push({ description: desc, image: img });
+      }
+    });
 
-    // Load initial section on page load
-    window.onload = loadSection;
-  </script>
+    if (entries.length === 0) {
+      status.style.color = 'red';
+      status.textContent = 'Please add at least one entry.';
+      return;
+    }
+
+    saveBtn.disabled = true;
+    status.style.color = 'black';
+    status.textContent = 'Saving...';
+
+    try {
+      await db.collection('sections').doc(sectionId).set({ entries }, { merge: true });
+      status.style.color = 'green';
+      status.textContent = 'Section saved successfully!';
+    } catch (error) {
+      status.style.color = 'red';
+      status.textContent = 'ERROR: ' + error.message;
+    } finally {
+      saveBtn.disabled = false;
+    }
+  }
+</script>
 
 </body>
 </html>
