@@ -394,14 +394,20 @@
     });
 
     function showSection(sectionId) {
-      const allSections = ['default-content', 'res-exterior', 'res-interior', 'com-exterior', 'com-interior', 'line-painting'];
-      allSections.forEach(id => {
-        document.getElementById(id).style.display = (id === sectionId) ? 'block' : 'none';
-      });
+  const allSections = ['default-content', 'res-exterior', 'res-interior', 'com-exterior', 'com-interior', 'line-painting', 'reviews'];
+  allSections.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.style.display = (id === sectionId) ? 'block' : 'none';
+  });
 
-      loadSectionContent(sectionId);
-      document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
-    }
+  if(sectionId !== 'reviews') {
+    loadSectionContent(sectionId);
+  } else {
+    // Call loadReviews if needed, for example:
+    loadReviews(firebase.auth().currentUser);
+  }
+  document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+}
 
     async function loadSectionContent(sectionId) {
   const box = document.querySelector(`#${sectionId} .content-box`);
