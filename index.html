@@ -148,7 +148,29 @@
       text-align: center;
     }
 
+    .entry {
+  margin-bottom: 30px;
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  text-align: left;
+}
 
+.entry img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.entry p {
+  font-size: 1.1em;
+  color: #333;
+  margin: 0;
+  white-space: pre-wrap; /* preserve line breaks */
+}
 
     /* Login modal styles - fixed */
     #login-modal {
@@ -341,10 +363,12 @@
           }
 
           entries.forEach((entry, idx) => {
+  html += '<div class="entry">';
   if (entry.image) {
     html += `<img src="${entry.image}" alt="${formatTitle(sectionId)} Image ${idx + 1}" />`;
   }
   html += `<p>${entry.description || '[No description]'}</p>`;
+  html += '</div>';
 });
 
           box.innerHTML = html;
