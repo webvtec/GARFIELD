@@ -39,17 +39,11 @@
       border: 1px solid #ccc;
       border-radius: 4px;
       font-size: 1rem;
-      transition: border-color 0.3s;
-    }
-    select:focus, input[type="url"]:focus, textarea:focus {
-      border-color: #3498db;
-      outline: none;
     }
     textarea {
       resize: vertical;
       min-height: 80px;
       font-family: inherit;
-      font-size: 1rem;
     }
     button {
       margin-top: 20px;
@@ -62,14 +56,13 @@
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      transition: background-color 0.3s;
+    }
+    button:hover:not(:disabled) {
+      background-color: #2980b9;
     }
     button:disabled {
       background-color: #95a5a6;
       cursor: not-allowed;
-    }
-    button:hover:not(:disabled) {
-      background-color: #2980b9;
     }
     #status {
       margin-top: 15px;
@@ -82,19 +75,33 @@
       max-width: 100%;
       max-height: 250px;
       border-radius: 6px;
-      box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
       display: none;
       object-fit: contain;
+    }
+    .entry-list {
+      margin-top: 30px;
+    }
+    .entry {
+      margin-bottom: 20px;
+      padding: 15px;
+      background-color: #f2f2f2;
+      border-radius: 6px;
+    }
+    .entry img {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 4px;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
 
-  <div id="admin-section" role="main" aria-label="Admin Section Update">
+  <div id="admin-section">
     <h2>Update Section</h2>
 
     <label for="section-select">Select Section:</label>
-    <select id="section-select" aria-required="true" aria-describedby="status">
+    <select id="section-select">
       <option value="default-content">Default Welcome</option>
       <option value="res-exterior">Residential - Exterior</option>
       <option value="res-interior">Residential - Interior</option>
@@ -106,15 +113,17 @@
     <button type="button" onclick="addNewEntry()">Add New to This Section</button>
 
     <label for="description">Description:</label>
-    <textarea id="description" placeholder="Enter description here..." required></textarea>
+    <textarea id="description" placeholder="Enter description here..."></textarea>
 
     <label for="image-url">Image URL (optional):</label>
-    <input type="url" id="image-url" placeholder="Paste public image URL (e.g. Imgur or Firebase)" />
+    <input type="url" id="image-url" placeholder="Paste public image URL" />
 
-    <img id="image-preview" alt="Preview of selected image" />
+    <img id="image-preview" alt="Image Preview" />
 
     <button id="save-btn" onclick="saveEntry()">Save Entry</button>
-    <p id="status" role="status" aria-live="polite"></p>
+    <p id="status"></p>
+
+    <div class="entry-list" id="entry-list"></div>
   </div>
 
   <script>
@@ -136,6 +145,7 @@
     const imagePreview = document.getElementById('image-preview');
     const status = document.getElementById('status');
     const saveBtn = document.getElementById('save-btn');
+    const entryList = document.getElementById('entry-list');
 
     sectionSelect.addEventListener('change', loadSection);
 
@@ -145,43 +155,67 @@
         imagePreview.src = url;
         imagePreview.style.display = 'block';
       } else {
-        imagePreview.style.display = 'none';
         imagePreview.src = '';
+        imagePreview.style.display = 'none';
       }
     });
 
+    function addNewEntry() {
+      descriptionInput.value = '';
+      imageUrlInput.value = '';
+      imagePreview.src = '';
+      imagePreview.style.display = 'none';
+      status.textContent = 'Ready to add new entry.';
+      status.style.color = 'black';
+    }
+
     async function loadSection() {
       const sectionId = sectionSelect.value;
-      status.style.color = 'black';
       status.textContent = 'Loading section data...';
+      status.style.color = 'black';
       saveBtn.disabled = true;
+      entryList.innerHTML = '';
 
       try {
         const doc = await db.collection('sections').doc(sectionId).get();
         if (doc.exists) {
           const data = doc.data();
           const entries = data.entries || [];
-          const lastEntry = entries[entries.length - 1] || {};
-          descriptionInput.value = lastEntry.description || '';
-          imageUrlInput.value = lastEntry.image || '';
-          if (lastEntry.image) {
-            imagePreview.src = lastEntry.image;
-            imagePreview.style.display = 'block';
+
+          if (entries.length > 0) {
+            // Display all entries
+            entries.forEach(entry => {
+              const div = document.createElement('div');
+              div.className = 'entry';
+              div.innerHTML = `
+                <div><strong>Description:</strong><br>${entry.description || ''}</div>
+                ${entry.image ? `<img src="${entry.image}" alt="Image" />` : ''}
+              `;
+              entryList.appendChild(div);
+            });
+
+            // Load the last entry into the input fields
+            const lastEntry = entries[entries.length - 1];
+            descriptionInput.value = lastEntry.description || '';
+            imageUrlInput.value = lastEntry.image || '';
+            if (lastEntry.image) {
+              imagePreview.src = lastEntry.image;
+              imagePreview.style.display = 'block';
+            } else {
+              imagePreview.src = '';
+              imagePreview.style.display = 'none';
+            }
+
+            status.textContent = '';
           } else {
-            imagePreview.style.display = 'none';
-            imagePreview.src = '';
+            status.textContent = 'No entries yet for this section.';
           }
-          status.textContent = '';
         } else {
-          descriptionInput.value = '';
-          imageUrlInput.value = '';
-          imagePreview.style.display = 'none';
-          imagePreview.src = '';
-          status.textContent = 'No saved data for this section yet.';
+          status.textContent = 'No data found for this section.';
         }
-      } catch (error) {
+      } catch (err) {
+        status.textContent = 'Error loading data: ' + err.message;
         status.style.color = 'red';
-        status.textContent = 'ERROR loading section: ' + error.message;
       } finally {
         saveBtn.disabled = false;
       }
@@ -190,46 +224,39 @@
     async function saveEntry() {
       const sectionId = sectionSelect.value;
       const description = descriptionInput.value.trim();
-      const imageURL = imageUrlInput.value.trim();
+      const image = imageUrlInput.value.trim();
 
       if (!description) {
-        status.style.color = 'red';
         status.textContent = 'Description cannot be empty.';
+        status.style.color = 'red';
         return;
       }
 
       saveBtn.disabled = true;
+      status.textContent = 'Saving...';
       status.style.color = 'black';
-      status.textContent = 'Saving entry...';
 
-      const entry = {
+      const newEntry = {
         description,
-        image: imageURL || null,
+        image: image || null,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       };
 
       try {
         await db.collection('sections').doc(sectionId).set({
-          entries: firebase.firestore.FieldValue.arrayUnion(entry)
+          entries: firebase.firestore.FieldValue.arrayUnion(newEntry)
         }, { merge: true });
 
+        status.textContent = 'Entry saved!';
         status.style.color = 'green';
-        status.textContent = 'Entry added successfully!';
-      } catch (error) {
+        addNewEntry(); // clear form
+        loadSection(); // reload entries
+      } catch (err) {
+        status.textContent = 'Error saving: ' + err.message;
         status.style.color = 'red';
-        status.textContent = 'ERROR: ' + error.message;
       } finally {
         saveBtn.disabled = false;
       }
-    }
-
-    function addNewEntry() {
-      descriptionInput.value = '';
-      imageUrlInput.value = '';
-      imagePreview.style.display = 'none';
-      imagePreview.src = '';
-      status.style.color = 'black';
-      status.textContent = 'Ready to add new entry to current section.';
     }
 
     window.onload = loadSection;
