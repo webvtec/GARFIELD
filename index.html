@@ -362,53 +362,51 @@
     }
 
     async function loadSectionContent(sectionId) {
-      const box = document.querySelector(`#${sectionId} .content-box`);
-      const docRef = db.collection('sections').doc(sectionId);
+  const box = document.querySelector(`#${sectionId} .content-box`);
+  const docRef = db.collection('sections').doc(sectionId);
 
-      try {
-        const doc = await docRef.get();
+  try {
+    const doc = await docRef.get();
 
-        if (doc.exists) {
-          const data = doc.data();
+    if (doc.exists) {
+      const data = doc.data();
 
-          const entries = data.entries || 
-                          ((data.description || data.image) ? [{ description: data.description || '', image: data.image || null }] : []);
+      const entries = data.entries || 
+                      ((data.description || data.image) ? [{ description: data.description || '', image: data.image || null }] : []);
 
-          if (entries.length === 0) {
-            box.innerHTML = `<p>No content available for this section.</p>`;
-            return;
-          }
-
-          let html = '';
-          if (sectionId !== 'default-content') {
-            html += `<h2>${formatTitle(sectionId)}</h2>`;
-          }
-
-          entries.forEach((entry, idx) => {
-            html += '<div class="entry">';
-            if (entry.image) {
-              html += `
-                <div class="image-header-wrapper">
-                  <img src="${entry.image}" alt="${formatTitle(sectionId)} Image ${idx + 1}" />
-                  ${entry.header ? `<div class="image-header-text">${entry.header}</div>` : ''}
-                </div>`;
-            } else if (entry.header) {
-              html += `<h3>${entry.header}</h3>`;
-            }
-            html += `<p>${entry.description || '[No description]'}</p>`;
-            html += '</div>';
-          });
-
-          box.innerHTML = html;
-
-        } else {
-          box.innerHTML = `<p>No content available for this section.</p>`;
-        }
-      } catch (error) {
-        console.error("Error loading section:", error);
-        box.innerHTML = `<p>Failed to load content: ${error.message}</p>`;
+      if (entries.length === 0) {
+        box.innerHTML = `<p>No content available for this section.</p>`;
+        return;
       }
+
+      let html = '';
+
+      entries.forEach((entry, idx) => {
+        html += '<div class="entry">';
+
+        // ✅ Move <h3> BEFORE the image
+        if (entry.header) {
+          html += `<h3>${entry.header}</h3>`;
+        }
+
+        if (entry.image) {
+          html += `<img src="${entry.image}" alt="${entry.header || 'Image'}" />`;
+        }
+
+        html += `<p>${entry.description || '[No description]'}</p>`;
+        html += '</div>';
+      });
+
+      box.innerHTML = html;
+    } else {
+      box.innerHTML = `<p>No content available for this section.</p>`;
     }
+  } catch (error) {
+    console.error("Error loading section:", error);
+    box.innerHTML = `<p>Failed to load content: ${error.message}</p>`;
+  }
+}
+
 
     function formatTitle(id) {
       // Capitalize each word, replace dashes with spaces
