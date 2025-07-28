@@ -13,7 +13,7 @@
       color: #333;
     }
     #admin-section {
-      max-width: 500px;
+      max-width: 600px;
       margin: auto;
       background: white;
       padding: 30px;
@@ -87,6 +87,26 @@
       display: none;
       object-fit: contain;
     }
+    #entries-list {
+      margin-top: 30px;
+      border-top: 1px solid #ccc;
+      padding-top: 20px;
+    }
+    .entry {
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 6px;
+      background: #fafafa;
+    }
+    .entry img {
+      max-width: 100%;
+      max-height: 180px;
+      object-fit: contain;
+      border-radius: 4px;
+      display: block;
+      margin-bottom: 8px;
+    }
   </style>
 </head>
 <body>
@@ -112,8 +132,12 @@
 
     <img id="image-preview" alt="Preview of selected image" />
 
-    <button id="save-btn" onclick="saveSection()">Save Section</button>
+    <button id="save-btn" onclick="saveSection()">Add Entry</button>
     <p id="status" role="status" aria-live="polite"></p>
+
+    <div id="entries-list" aria-live="polite" aria-label="Current entries in section">
+      <!-- Existing entries will be shown here -->
+    </div>
   </div>
 
   <script>
@@ -135,9 +159,7 @@
     const imagePreview = document.getElementById('image-preview');
     const status = document.getElementById('status');
     const saveBtn = document.getElementById('save-btn');
-
-    // Load section data when selection changes
-    sectionSelect.addEventListener('change', loadSection);
+    const entriesList = document.getElementById('entries-list');
 
     // Show image preview when image URL changes
     imageUrlInput.addEventListener('input', () => {
@@ -151,33 +173,57 @@
       }
     });
 
+    // Load all entries for a section and display
     async function loadSection() {
       const sectionId = sectionSelect.value;
       status.style.color = 'black';
       status.textContent = 'Loading section data...';
       saveBtn.disabled = true;
+      entriesList.innerHTML = '';
 
       try {
         const doc = await db.collection('sections').doc(sectionId).get();
         if (doc.exists) {
           const data = doc.data();
-          descriptionInput.value = data.description || '';
-          imageUrlInput.value = data.image || '';
-          if (data.image) {
-            imagePreview.src = data.image;
-            imagePreview.style.display = 'block';
+          const entries = data.entries || [];
+
+          if (entries.length === 0) {
+            entriesList.innerHTML = '<p>No entries saved for this section yet.</p>';
           } else {
-            imagePreview.style.display = 'none';
-            imagePreview.src = '';
+            // Show all entries
+            entriesList.innerHTML = '';
+            entries.forEach((entry, idx) => {
+              const entryDiv = document.createElement('div');
+              entryDiv.className = 'entry';
+              entryDiv.setAttribute('tabindex', '0');
+
+              if (entry.image) {
+                const img = document.createElement('img');
+                img.src = entry.image;
+                img.alt = `Image ${idx + 1} for section ${sectionId}`;
+                entryDiv.appendChild(img);
+              }
+              const descPara = document.createElement('p');
+              descPara.textContent = entry.description || '(No description)';
+              entryDiv.appendChild(descPara);
+
+              entriesList.appendChild(entryDiv);
+            });
           }
-          status.textContent = '';
-        } else {
-          // No data for this section yet
+          // Clear input fields for new entry
           descriptionInput.value = '';
           imageUrlInput.value = '';
           imagePreview.style.display = 'none';
           imagePreview.src = '';
-          status.textContent = 'No saved data for this section yet.';
+
+          status.textContent = '';
+        } else {
+          entriesList.innerHTML = '<p>No saved entries for this section yet.</p>';
+          descriptionInput.value = '';
+          imageUrlInput.value = '';
+          imagePreview.style.display = 'none';
+          imagePreview.src = '';
+          status.textContent = '';
         }
       } catch (error) {
         status.style.color = 'red';
@@ -187,6 +233,7 @@
       }
     }
 
+    // Add new entry to the entries array for the section
     async function saveSection() {
       const sectionId = sectionSelect.value;
       const description = descriptionInput.value.trim();
@@ -203,14 +250,26 @@
       status.textContent = 'Saving...';
 
       try {
-        const data = { description };
-        if (imageURL) data.image = imageURL;
-        else data.image = firebase.firestore.FieldValue.delete();
+        const sectionRef = db.collection('sections').doc(sectionId);
+        const doc = await sectionRef.get();
 
-        await db.collection('sections').doc(sectionId).set(data, { merge: true });
+        let entries = [];
+        if (doc.exists) {
+          const data = doc.data();
+          entries = data.entries || [];
+        }
+
+        // Append new entry
+        entries.push({ description, image: imageURL || null });
+
+        // Save updated entries array
+        await sectionRef.set({ entries }, { merge: true });
 
         status.style.color = 'green';
-        status.textContent = 'Section saved successfully!';
+        status.textContent = 'Entry added successfully!';
+
+        // Reload section to update display
+        await loadSection();
       } catch (error) {
         status.style.color = 'red';
         status.textContent = 'ERROR: ' + error.message;
@@ -221,6 +280,7 @@
 
     // Load initial section on page load
     window.onload = loadSection;
+    sectionSelect.addEventListener('change', loadSection);
   </script>
 
 </body>
