@@ -150,6 +150,16 @@
       text-align: left;
     }
 
+    .entry img.round-image {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto 12px;
+}
+
+
     /* New wrapper for image + header overlay */
     .image-header-wrapper {
       position: relative;
@@ -373,7 +383,9 @@
       const data = doc.data();
 
       const entries = data.entries || 
-                      ((data.description || data.image) ? [{ description: data.description || '', image: data.image || null }] : []);
+        ((data.description || data.image)
+          ? [{ description: data.description || '', image: data.image || null }]
+          : []);
 
       if (entries.length === 0) {
         box.innerHTML = `<p>No content available for this section.</p>`;
@@ -385,13 +397,16 @@
       entries.forEach((entry, idx) => {
         html += '<div class="entry">';
 
-        // ✅ Move <h3> BEFORE the image
+        // Show header above image
         if (entry.header) {
           html += `<h3>${entry.header}</h3>`;
         }
 
+        // Use round image ONLY for the first image on default-content
         if (entry.image) {
-          html += `<img src="${entry.image}" alt="${entry.header || 'Image'}" />`;
+          const isDefault = sectionId === 'default-content' && idx === 0;
+          const imgClass = isDefault ? 'round-image' : '';
+          html += `<img src="${entry.image}" class="${imgClass}" alt="${entry.header || 'Image'}" />`;
         }
 
         html += `<p>${entry.description || '[No description]'}</p>`;
@@ -407,6 +422,7 @@
     box.innerHTML = `<p>Failed to load content: ${error.message}</p>`;
   }
 }
+
 
 
     function formatTitle(id) {
