@@ -14,7 +14,6 @@
 </head>
 <body>
 
-  <!-- Admin Panel (always visible, no login) -->
   <div id="admin-section">
     <h2>Update Section</h2>
     <label for="section-select">Select Section:</label>
@@ -25,16 +24,18 @@
       <option value="com-exterior">Commercial - Exterior</option>
       <option value="com-interior">Commercial - Interior</option>
     </select>
+
     <label for="description">Description:</label>
-    <textarea id="description" placeholder="Enter description here..." aria-required="true"></textarea>
+    <textarea id="description" placeholder="Enter description here..." required></textarea>
+
     <label for="image-url">Image URL (optional):</label>
-    <input type="url" id="image-url" placeholder="Paste image URL here (optional)" />
-    <button onclick="saveSection()" aria-label="Save section data">Save Section</button>
-    <p id="status" style="color: green;" role="status" aria-live="polite"></p>
+    <input type="url" id="image-url" placeholder="Paste public image URL (e.g. Imgur or Firebase)" />
+
+    <button onclick="saveSection()">Save Section</button>
+    <p id="status" role="status"></p>
   </div>
 
   <script>
-    // Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyBtndRroVa279cpMzQlIiphU1W9Uw_Yg6U",
       authDomain: "kravin-delivery.firebaseapp.com",
