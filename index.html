@@ -309,33 +309,35 @@
   <div class="content" id="line-painting" style="display: none;"><div class="content-box"></div></div>
 
   <div id="reviewsSection" class="content-section" style="display:none;">
-    <h1 style="text-align:center; color:#6200ea;">REVIEWS</h1>
+  <h1 style="text-align:center; color:#6200ea;">REVIEWS</h1>
 
-    <form id="reviewForm" style="max-width:85%; margin:10px auto; text-align:center;">
+  <form id="reviewForm" style="max-width:85%; margin:10px auto; text-align:center;">
+    <div style="max-width: 300px; margin: 0 auto;">
       <input type="text" id="reviewName" placeholder="Your Name" required
         style="width:100%; margin-bottom:10px; padding:10px; border-radius:6px; border:1px solid #ccc;" />
+    </div>
 
-      <textarea id="reviewComment" placeholder="Write your review..." required
-        style="width:90%; height:80px; margin-bottom:10px; padding:10px; border-radius:6px; border:1px solid #ccc;"></textarea>
+    <textarea id="reviewComment" placeholder="Write your review..." required
+      style="width:90%; height:80px; margin-bottom:10px; padding:10px; border-radius:6px; border:1px solid #ccc;"></textarea>
 
-      <div id="starRating" style="font-size:24px; margin-bottom:10px; cursor:pointer; color:#ccc;">
-        <span data-value="1">★</span>
-        <span data-value="2">★</span>
-        <span data-value="3">★</span>
-        <span data-value="4">★</span>
-        <span data-value="5">★</span>
-      </div>
+    <div id="starRating" style="font-size:24px; margin-bottom:10px; cursor:pointer; color:#ccc;">
+      <span data-value="1">★</span>
+      <span data-value="2">★</span>
+      <span data-value="3">★</span>
+      <span data-value="4">★</span>
+      <span data-value="5">★</span>
+    </div>
 
-      <button type="submit"
-        style="background-color:#6200ea; color:white; border:none; padding:10px 20px; border-radius:6px; cursor:pointer;">Submit
-        Review</button>
-    </form>
+    <button type="submit"
+      style="background-color:#6200ea; color:white; border:none; padding:10px 20px; border-radius:6px; cursor:pointer;">Submit
+      Review</button>
+  </form>
 
-    <p id="reviewSubmitMsg" style="text-align:center; color:green;"></p>
+  <p id="reviewSubmitMsg" style="text-align:center; color:green;"></p>
 
-    <!-- Container where reviews will be loaded -->
-    <div id="reviewsContainer" style="max-width:100%; margin:20px auto;"></div>
-  </div>
+  <!-- Container where reviews will be loaded -->
+  <div id="reviewsContainer" style="max-width:100%; margin:20px auto;"></div>
+</div>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
