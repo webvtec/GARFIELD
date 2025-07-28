@@ -379,6 +379,18 @@
   <div id="reviewsContainer" style="max-width:100%; margin:20px auto;"></div>
 </div>
 
+  <!-- Login Modal -->
+<div id="login-modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+  <div style="background:#fff; padding:30px; border-radius:10px; width:320px; max-width:90%; text-align:center; box-shadow:0 0 15px rgba(0,0,0,0.3);">
+    <h2>Admin Login</h2>
+    <input type="email" id="login-email" placeholder="Email" style="width:100%; padding:10px; margin-bottom:10px; border-radius:6px; border:1px solid #ccc;">
+    <input type="password" id="login-password" placeholder="Password" style="width:100%; padding:10px; margin-bottom:10px; border-radius:6px; border:1px solid #ccc;">
+    <div id="login-error" style="color:red; min-height:20px; margin-bottom:10px;"></div>
+    <button id="login-submit" style="width:100%; padding:12px; background:#177FB9; color:#fff; border:none; border-radius:6px; cursor:pointer;">Login</button>
+    <button id="login-cancel" style="width:100%; padding:12px; margin-top:10px; background:#ccc; border:none; border-radius:6px; cursor:pointer;">Cancel</button>
+  </div>
+</div>
+
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -646,6 +658,60 @@ window.deleteReview = deleteReview;
     window.onload = () => {
       showSection('default-content');
     }
+
+    const adminBtn = document.getElementById('admin-dashboard-btn');
+const loginModal = document.getElementById('login-modal');
+const loginEmail = document.getElementById('login-email');
+const loginPassword = document.getElementById('login-password');
+const loginError = document.getElementById('login-error');
+const loginSubmit = document.getElementById('login-submit');
+const loginCancel = document.getElementById('login-cancel');
+
+// Show login modal on admin button click
+adminBtn.addEventListener('click', e => {
+  e.preventDefault();
+  loginEmail.value = '';
+  loginPassword.value = '';
+  loginError.textContent = '';
+  loginModal.style.display = 'flex';
+  loginEmail.focus();
+});
+
+// Cancel button hides modal
+loginCancel.addEventListener('click', () => {
+  loginModal.style.display = 'none';
+});
+
+// Submit login
+loginSubmit.addEventListener('click', async () => {
+  const email = loginEmail.value.trim();
+  const password = loginPassword.value;
+
+  if (!email || !password) {
+    loginError.textContent = 'Please enter email and password.';
+    return;
+  }
+
+  loginError.textContent = 'Logging in...';
+
+  try {
+    await firebase.auth().signInWithEmailAndPassword(email, password);
+    loginError.textContent = '';
+    loginModal.style.display = 'none';
+    // Redirect to admin dashboard after successful login
+    window.location.href = 'admin-dashboard.html';
+  } catch (err) {
+    loginError.textContent = 'Login failed: ' + err.message;
+  }
+});
+
+// Optional: Close modal if user clicks outside the modal content
+loginModal.addEventListener('click', e => {
+  if (e.target === loginModal) {
+    loginModal.style.display = 'none';
+  }
+});
+
   </script>
 </body>
 </html>
