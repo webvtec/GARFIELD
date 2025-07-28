@@ -248,7 +248,7 @@
             <li><a href="#" onclick="showSection('com-interior')">INTERIOR PAINTING</a></li>
           </ul>
         </li>
-        <li><a href="#line">Line Painting</a></li>
+        <li><a href="#" onclick="showSection('line-painting')">Line Painting</a></li>
         <li><a href="#" id="admin-dashboard-btn">Admin Dashboard</a></li>
       </ul>
     </nav>
@@ -260,6 +260,8 @@
   <div class="content" id="res-interior" style="display: none;"><div class="content-box"></div></div>
   <div class="content" id="com-exterior" style="display: none;"><div class="content-box"></div></div>
   <div class="content" id="com-interior" style="display: none;"><div class="content-box"></div></div>
+  <div class="content" id="line-painting" style="display: none;"><div class="content-box"></div></div>
+
 
   <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -310,7 +312,7 @@
     });
 
     function showSection(sectionId) {
-      const allSections = ['default-content', 'res-exterior', 'res-interior', 'com-exterior', 'com-interior'];
+      const allSections = ['default-content', 'res-exterior', 'res-interior', 'com-exterior', 'com-interior', 'line-painting'];
       allSections.forEach(id => {
         document.getElementById(id).style.display = (id === sectionId) ? 'block' : 'none';
       });
