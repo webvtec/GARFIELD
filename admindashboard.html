@@ -2,102 +2,112 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin Dashboard - Full Screen Sections</title>
+  <title>Admin Dashboard - Multi Entries</title>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <style>
-    /* Full screen, no margin */
     html, body {
-      margin: 0; padding: 0; height: 100%;
+      margin: 0;
+      padding: 0;
+      height: 100%;
       font-family: Arial, sans-serif;
       background: #f9fafb;
-      color: #333;
       overflow-y: auto;
     }
+
     #admin-container {
-      max-width: 800px;
+      max-width: 900px;
       margin: 0 auto;
       padding: 30px 20px 60px;
-      min-height: 100vh;
-      box-sizing: border-box;
     }
+
     h1 {
       text-align: center;
+      margin-bottom: 40px;
       color: #2c3e50;
+    }
+
+    .section-block {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       margin-bottom: 40px;
     }
-    .section-card {
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgb(0 0 0 / 0.1);
-      padding: 25px 20px;
-      margin-bottom: 30px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .section-card h2 {
-      margin: 0 0 10px;
+
+    .section-block h2 {
+      margin-top: 0;
       color: #34495e;
     }
-    label {
-      font-weight: bold;
-      color: #34495e;
+
+    .entry {
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 15px;
+      margin-top: 20px;
+      background: #fefefe;
+      position: relative;
     }
-    textarea, input[type="url"] {
-      font-family: inherit;
-      font-size: 1rem;
-      padding: 10px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      resize: vertical;
+
+    .entry textarea, .entry input[type="url"] {
       width: 100%;
       box-sizing: border-box;
-      transition: border-color 0.3s;
+      padding: 10px;
+      font-size: 1rem;
+      margin-top: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
     }
-    textarea:focus, input[type="url"]:focus {
-      border-color: #3498db;
-      outline: none;
-    }
-    textarea {
-      min-height: 80px;
-    }
-    img.preview {
+
+    .entry img {
       max-width: 100%;
       max-height: 250px;
-      border-radius: 6px;
-      box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
-      object-fit: contain;
-      margin-top: 8px;
+      margin-top: 10px;
+      display: block;
     }
-    button.save-btn {
-      align-self: flex-start;
-      padding: 12px 24px;
-      font-size: 1rem;
-      font-weight: bold;
-      color: white;
-      background-color: #3498db;
+
+    .entry-actions {
+      margin-top: 10px;
+    }
+
+    .entry-actions button {
+      margin-right: 10px;
+      padding: 10px 15px;
       border: none;
-      border-radius: 6px;
+      border-radius: 4px;
+      font-weight: bold;
       cursor: pointer;
-      transition: background-color 0.3s;
+    }
+
+    .save-btn {
+      background: #3498db;
+      color: white;
+    }
+
+    .delete-btn {
+      background: #e74c3c;
+      color: white;
+    }
+
+    .add-entry-btn {
       margin-top: 15px;
+      background: #2ecc71;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
     }
-    button.save-btn:disabled {
-      background-color: #95a5a6;
-      cursor: not-allowed;
-    }
-    button.save-btn:hover:not(:disabled) {
-      background-color: #2980b9;
-    }
+
     .status-msg {
       font-weight: bold;
-      margin-top: 8px;
-      min-height: 20px;
+      margin-top: 10px;
     }
+
     .status-success {
       color: green;
     }
+
     .status-error {
       color: red;
     }
@@ -105,13 +115,11 @@
 </head>
 <body>
 
-  <div id="admin-container" role="main" aria-label="Admin Section Updates">
-    <h1>Admin Dashboard - Update Sections</h1>
-    <!-- Sections will be inserted here dynamically -->
+  <div id="admin-container">
+    <h1>Admin Dashboard - Edit Sections</h1>
   </div>
 
   <script>
-    // Firebase config & init
     const firebaseConfig = {
       apiKey: "AIzaSyBtndRroVa279cpMzQlIiphU1W9Uw_Yg6U",
       authDomain: "kravin-delivery.firebaseapp.com",
@@ -124,7 +132,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    const sectionsList = [
+    const sections = [
       { id: "default-content", name: "Default Welcome" },
       { id: "res-exterior", name: "Residential - Exterior" },
       { id: "res-interior", name: "Residential - Interior" },
@@ -135,124 +143,143 @@
 
     const container = document.getElementById('admin-container');
 
-    // Utility to create elements easily
-    function createElem(tag, props = {}, ...children) {
-      const el = document.createElement(tag);
-      Object.entries(props).forEach(([k,v]) => {
-        if (k === 'className') el.className = v;
-        else if (k === 'htmlFor') el.htmlFor = v;
-        else if (k.startsWith('aria')) el.setAttribute(k, v);
-        else el[k] = v;
-      });
-      children.forEach(child => {
-        if (typeof child === 'string') el.appendChild(document.createTextNode(child));
-        else if (child) el.appendChild(child);
-      });
-      return el;
+    function createUniqueId() {
+      return '_' + Math.random().toString(36).substr(2, 9);
     }
 
-    async function loadSectionData(sectionId) {
-      try {
-        const doc = await db.collection('sections').doc(sectionId).get();
-        if (doc.exists) return doc.data();
-        return null;
-      } catch (e) {
-        return null;
-      }
-    }
+    async function loadSections() {
+      for (const section of sections) {
+        const secDiv = document.createElement('div');
+        secDiv.className = 'section-block';
+        const h2 = document.createElement('h2');
+        h2.textContent = section.name;
 
-    function createSectionCard(section) {
-      const card = createElem('section', { className: 'section-card', 'aria-label': section.name });
+        const status = document.createElement('div');
+        status.className = 'status-msg';
 
-      const title = createElem('h2', {}, section.name);
-      const labelDesc = createElem('label', { htmlFor: section.id + '-desc' }, 'Description:');
-      const textarea = createElem('textarea', { id: section.id + '-desc', placeholder: 'Enter description here...' });
+        const entriesDiv = document.createElement('div');
 
-      const labelImage = createElem('label', { htmlFor: section.id + '-img' }, 'Image URL (optional):');
-      const inputImage = createElem('input', { 
-        type: 'url', id: section.id + '-img', placeholder: 'Paste public image URL (e.g. Imgur or Firebase)' 
-      });
+        const addBtn = document.createElement('button');
+        addBtn.textContent = 'Add New Entry';
+        addBtn.className = 'add-entry-btn';
+        addBtn.onclick = () => {
+          const newEntry = { id: createUniqueId(), description: '', image: '' };
+          renderEntry(section.id, entriesDiv, newEntry, status);
+        };
 
-      const imagePreview = createElem('img', { className: 'preview', alt: `Preview for ${section.name}`, style: 'display:none;' });
-
-      const statusMsg = createElem('p', { className: 'status-msg', role: 'status', 'aria-live': 'polite' });
-
-      const saveBtn = createElem('button', { className: 'save-btn' }, 'Save Section');
-
-      // Image preview on URL change
-      inputImage.addEventListener('input', () => {
-        if(inputImage.value.trim()) {
-          imagePreview.src = inputImage.value.trim();
-          imagePreview.style.display = 'block';
-        } else {
-          imagePreview.src = '';
-          imagePreview.style.display = 'none';
-        }
-        statusMsg.textContent = '';
-      });
-
-      // Save button logic
-      saveBtn.addEventListener('click', async () => {
-        const description = textarea.value.trim();
-        const imageURL = inputImage.value.trim();
-
-        if (!description) {
-          statusMsg.textContent = 'Description cannot be empty.';
-          statusMsg.className = 'status-msg status-error';
-          return;
-        }
-
-        saveBtn.disabled = true;
-        statusMsg.textContent = 'Saving...';
-        statusMsg.className = 'status-msg';
+        secDiv.appendChild(h2);
+        secDiv.appendChild(entriesDiv);
+        secDiv.appendChild(addBtn);
+        secDiv.appendChild(status);
+        container.appendChild(secDiv);
 
         try {
-          const data = { description };
-          if (imageURL) data.image = imageURL;
-          else data.image = firebase.firestore.FieldValue.delete();
+          const doc = await db.collection('sections').doc(section.id).get();
+          const data = doc.exists ? doc.data() : {};
+          const entries = data.entries || [];
 
-          await db.collection('sections').doc(section.id).set(data, { merge: true });
-
-          statusMsg.textContent = 'Section saved successfully!';
-          statusMsg.className = 'status-msg status-success';
+          entries.forEach(entry => {
+            renderEntry(section.id, entriesDiv, entry, status);
+          });
         } catch (error) {
-          statusMsg.textContent = 'ERROR: ' + error.message;
-          statusMsg.className = 'status-msg status-error';
-        } finally {
-          saveBtn.disabled = false;
-        }
-      });
-
-      card.append(title, labelDesc, textarea, labelImage, inputImage, imagePreview, saveBtn, statusMsg);
-      return card;
-    }
-
-    async function init() {
-      container.innerHTML = ''; // Clear container
-
-      for (const section of sectionsList) {
-        const card = createSectionCard(section);
-        container.appendChild(card);
-
-        // Load saved data for each section
-        const data = await loadSectionData(section.id);
-        if (data) {
-          const textarea = card.querySelector('textarea');
-          const inputImage = card.querySelector('input[type="url"]');
-          const imagePreview = card.querySelector('img.preview');
-
-          textarea.value = data.description || '';
-          if (data.image) {
-            inputImage.value = data.image;
-            imagePreview.src = data.image;
-            imagePreview.style.display = 'block';
-          }
+          status.textContent = 'Error loading section.';
+          status.className = 'status-msg status-error';
         }
       }
     }
 
-    window.onload = init;
-  </script>
+    function renderEntry(sectionId, container, entry, statusBox) {
+      const div = document.createElement('div');
+      div.className = 'entry';
 
+      const desc = document.createElement('textarea');
+      desc.placeholder = 'Description...';
+      desc.value = entry.description || '';
+
+      const imgInput = document.createElement('input');
+      imgInput.type = 'url';
+      imgInput.placeholder = 'Image URL...';
+      imgInput.value = entry.image || '';
+
+      const imgPreview = document.createElement('img');
+      if (entry.image) {
+        imgPreview.src = entry.image;
+      }
+
+      imgInput.addEventListener('input', () => {
+        imgPreview.src = imgInput.value.trim();
+      });
+
+      const actions = document.createElement('div');
+      actions.className = 'entry-actions';
+
+      const saveBtn = document.createElement('button');
+      saveBtn.textContent = 'Save';
+      saveBtn.className = 'save-btn';
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.textContent = 'Delete';
+      deleteBtn.className = 'delete-btn';
+
+      actions.appendChild(saveBtn);
+      actions.appendChild(deleteBtn);
+
+      saveBtn.onclick = async () => {
+        const updatedEntry = {
+          id: entry.id || createUniqueId(),
+          description: desc.value.trim(),
+          image: imgInput.value.trim()
+        };
+
+        try {
+          const ref = db.collection('sections').doc(sectionId);
+          const doc = await ref.get();
+          let entries = doc.exists && doc.data().entries ? doc.data().entries : [];
+
+          const index = entries.findIndex(e => e.id === updatedEntry.id);
+          if (index !== -1) {
+            entries[index] = updatedEntry;
+          } else {
+            entries.push(updatedEntry);
+          }
+
+          await ref.set({ entries }, { merge: true });
+
+          statusBox.textContent = 'Saved!';
+          statusBox.className = 'status-msg status-success';
+        } catch (err) {
+          statusBox.textContent = 'Error saving entry.';
+          statusBox.className = 'status-msg status-error';
+        }
+      };
+
+      deleteBtn.onclick = async () => {
+        try {
+          const ref = db.collection('sections').doc(sectionId);
+          const doc = await ref.get();
+          let entries = doc.exists && doc.data().entries ? doc.data().entries : [];
+
+          entries = entries.filter(e => e.id !== entry.id);
+
+          await ref.set({ entries }, { merge: true });
+
+          container.removeChild(div);
+          statusBox.textContent = 'Entry deleted.';
+          statusBox.className = 'status-msg status-success';
+        } catch (err) {
+          statusBox.textContent = 'Error deleting entry.';
+          statusBox.className = 'status-msg status-error';
+        }
+      };
+
+      div.appendChild(desc);
+      div.appendChild(imgInput);
+      div.appendChild(imgPreview);
+      div.appendChild(actions);
+      container.appendChild(div);
+    }
+
+    window.onload = loadSections;
+  </script>
 </body>
 </html>
