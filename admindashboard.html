@@ -118,46 +118,43 @@
       white-space: pre-wrap;
       color: #333;
     }
-    .entry .delete-btn {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: #e74c3c;
-      border: none;
-      color: white;
-      font-weight: bold;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      cursor: pointer;
-      line-height: 20px;
-      text-align: center;
-      font-size: 16px;
-      transition: background-color 0.3s;
-    }
-    .entry .delete-btn:hover {
-      background: #c0392b;
-    }
-    .entry .edit-btn {
-      position: absolute;
-      top: 8px;
-      right: 38px;
-      background: #f39c12;
-      border: none;
-      color: white;
-      font-weight: bold;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      cursor: pointer;
-      line-height: 20px;
-      text-align: center;
-      font-size: 14px;
-      transition: background-color 0.3s;
-    }
-    .entry .edit-btn:hover {
-      background: #d35400;
-    }
+    .entry .delete-btn,
+.entry .edit-btn {
+  position: absolute;
+  top: 8px;
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+}
+
+.entry .delete-btn {
+  right: 8px;
+  background: #e74c3c;
+}
+
+.entry .delete-btn:hover {
+  background: #c0392b;
+}
+
+.entry .edit-btn {
+  right: 42px;
+  background: #f39c12;
+}
+
+.entry .edit-btn:hover {
+  background: #d35400;
+}
+
   </style>
 </head>
 <body>
