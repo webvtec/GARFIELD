@@ -138,6 +138,26 @@
     .entry .delete-btn:hover {
       background: #c0392b;
     }
+    .entry .edit-btn {
+      position: absolute;
+      top: 8px;
+      right: 38px;
+      background: #f39c12;
+      border: none;
+      color: white;
+      font-weight: bold;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      line-height: 20px;
+      text-align: center;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+    .entry .edit-btn:hover {
+      background: #d35400;
+    }
   </style>
 </head>
 <body>
@@ -196,7 +216,8 @@
     const saveBtn = document.getElementById('save-btn');
     const entriesList = document.getElementById('entries-list');
 
-    // Show image preview when image URL changes
+    let editingIndex = null;
+
     imageUrlInput.addEventListener('input', () => {
       const url = imageUrlInput.value.trim();
       if (url) {
@@ -208,13 +229,14 @@
       }
     });
 
-    // Load all entries for a section and display
     async function loadSection() {
       const sectionId = sectionSelect.value;
       status.style.color = 'black';
       status.textContent = 'Loading section data...';
       saveBtn.disabled = true;
       entriesList.innerHTML = '';
+      editingIndex = null;
+      saveBtn.textContent = 'Add Entry';
 
       try {
         const doc = await db.collection('sections').doc(sectionId).get();
@@ -225,19 +247,24 @@
           if (entries.length === 0) {
             entriesList.innerHTML = '<p>No entries saved for this section yet.</p>';
           } else {
-            entriesList.innerHTML = '';
             entries.forEach((entry, idx) => {
               const entryDiv = document.createElement('div');
               entryDiv.className = 'entry';
               entryDiv.setAttribute('tabindex', '0');
 
-              // Delete button
               const deleteBtn = document.createElement('button');
               deleteBtn.className = 'delete-btn';
               deleteBtn.title = 'Delete entry';
               deleteBtn.textContent = '×';
               deleteBtn.onclick = () => deleteEntry(sectionId, idx);
               entryDiv.appendChild(deleteBtn);
+
+              const editBtn = document.createElement('button');
+              editBtn.className = 'edit-btn';
+              editBtn.title = 'Edit entry';
+              editBtn.textContent = '✎';
+              editBtn.onclick = () => startEdit(entry, idx);
+              entryDiv.appendChild(editBtn);
 
               if (entry.image) {
                 const img = document.createElement('img');
@@ -260,7 +287,6 @@
             });
           }
 
-          // Clear input fields for new entry
           headerInput.value = '';
           descriptionInput.value = '';
           imageUrlInput.value = '';
@@ -270,12 +296,6 @@
           status.textContent = '';
         } else {
           entriesList.innerHTML = '<p>No saved entries for this section yet.</p>';
-          headerInput.value = '';
-          descriptionInput.value = '';
-          imageUrlInput.value = '';
-          imagePreview.style.display = 'none';
-          imagePreview.src = '';
-          status.textContent = '';
         }
       } catch (error) {
         status.style.color = 'red';
@@ -285,21 +305,15 @@
       }
     }
 
-    // Add new entry to the entries array for the section
     async function saveSection() {
       const sectionId = sectionSelect.value;
       const header = headerInput.value.trim();
       const description = descriptionInput.value.trim();
       const imageURL = imageUrlInput.value.trim();
 
-      if (!header) {
+      if (!header || !description) {
         status.style.color = 'red';
-        status.textContent = 'Header cannot be empty.';
-        return;
-      }
-      if (!description) {
-        status.style.color = 'red';
-        status.textContent = 'Description cannot be empty.';
+        status.textContent = 'Header and description are required.';
         return;
       }
 
@@ -310,23 +324,23 @@
       try {
         const sectionRef = db.collection('sections').doc(sectionId);
         const doc = await sectionRef.get();
+        let entries = doc.exists ? (doc.data().entries || []) : [];
 
-        let entries = [];
-        if (doc.exists) {
-          const data = doc.data();
-          entries = data.entries || [];
+        const newEntry = { header, description, image: imageURL || null };
+
+        if (editingIndex !== null) {
+          entries[editingIndex] = newEntry;
+        } else {
+          entries.push(newEntry);
         }
 
-        // Append new entry
-        entries.push({ header, description, image: imageURL || null });
-
-        // Save updated entries array
         await sectionRef.set({ entries }, { merge: true });
 
         status.style.color = 'green';
-        status.textContent = 'Entry added successfully!';
+        status.textContent = editingIndex !== null ? 'Entry updated!' : 'Entry added!';
+        editingIndex = null;
+        saveBtn.textContent = 'Add Entry';
 
-        // Reload section to update display
         await loadSection();
       } catch (error) {
         status.style.color = 'red';
@@ -336,7 +350,6 @@
       }
     }
 
-    // Delete an entry by index
     async function deleteEntry(sectionId, entryIndex) {
       if (!confirm('Are you sure you want to delete this entry?')) return;
 
@@ -351,31 +364,19 @@
         if (!doc.exists) {
           status.style.color = 'red';
           status.textContent = 'Section data not found.';
-          saveBtn.disabled = false;
           return;
         }
 
-        const data = doc.data();
-        let entries = data.entries || [];
+        let entries = doc.data().entries || [];
 
-        if (entryIndex < 0 || entryIndex >= entries.length) {
-          status.style.color = 'red';
-          status.textContent = 'Invalid entry index.';
-          saveBtn.disabled = false;
-          return;
+        if (entryIndex >= 0 && entryIndex < entries.length) {
+          entries.splice(entryIndex, 1);
+          await sectionRef.set({ entries }, { merge: true });
+
+          status.style.color = 'green';
+          status.textContent = 'Entry deleted!';
+          await loadSection();
         }
-
-        // Remove the entry at entryIndex
-        entries.splice(entryIndex, 1);
-
-        // Save updated entries array
-        await sectionRef.set({ entries }, { merge: true });
-
-        status.style.color = 'green';
-        status.textContent = 'Entry deleted successfully!';
-
-        // Reload section to update display
-        await loadSection();
       } catch (error) {
         status.style.color = 'red';
         status.textContent = 'ERROR deleting entry: ' + error.message;
@@ -384,7 +385,18 @@
       }
     }
 
-    // Load initial section on page load
+    function startEdit(entry, index) {
+      headerInput.value = entry.header || '';
+      descriptionInput.value = entry.description || '';
+      imageUrlInput.value = entry.image || '';
+      imagePreview.src = entry.image || '';
+      imagePreview.style.display = entry.image ? 'block' : 'none';
+
+      editingIndex = index;
+      saveBtn.textContent = 'Update Entry';
+      status.textContent = 'Editing entry...';
+    }
+
     window.onload = loadSection;
     sectionSelect.addEventListener('change', loadSection);
   </script>
