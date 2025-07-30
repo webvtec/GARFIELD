@@ -315,6 +315,25 @@
       font-size: 14.5px;
 }
 
+    /* ---- Centered yellow action button inside each default page container ---- */
+.entry .action-btn {
+  display: block;
+  margin: 12px auto 0;
+  padding: 12px 18px;
+  font-weight: 800;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 6px;
+  background: #FFD400; /* yellow */
+  color: #000;
+  cursor: pointer;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+  transition: transform 0.06s ease, filter 0.15s ease;
+}
+.entry .action-btn:hover { filter: brightness(0.95); }
+.entry .action-btn:active { transform: translateY(1px); }
+
+
   </style>
 </head>
 <body>
@@ -541,6 +560,11 @@ document.querySelectorAll('#menu a').forEach(link => {
         box.innerHTML = `<p>Failed to load content: ${error.message}</p>`;
       }
     }
+    // Add the centered yellow action button only on the default page (home)
+if (sectionId === 'default-content' && entry.header) {
+  const safeHeader = String(entry.header).replace(/'/g, "\\'");
+  html += `<button class="action-btn" aria-label="View and schedule ${safeHeader}" onclick="goToSectionForTitle('${safeHeader}')">VIEW & SCHEDULE</button>`;
+}
 
     let selectedRating = 0;
 
@@ -720,6 +744,34 @@ loginModal.addEventListener('click', e => {
   }
 });
 
+// ---- Map default-page card titles to section IDs from the menu ----
+function resolveSectionFromTitle(title) {
+  const t = (title || '').toLowerCase().trim();
+  if (!t) return null;
+
+  // Residential
+  if (t.includes('residential') && t.includes('exterior')) return 'res-exterior';
+  if (t.includes('residential') && t.includes('interior')) return 'res-interior';
+
+  // Commercial
+  if (t.includes('commercial') && t.includes('exterior')) return 'com-exterior';
+  if (t.includes('commercial') && t.includes('interior')) return 'com-interior';
+
+  // Line painting
+  if (t.includes('line') && t.includes('painting')) return 'line-painting';
+
+  return null;
+}
+
+function goToSectionForTitle(title) {
+  const sectionId = resolveSectionFromTitle(title);
+  if (sectionId) {
+    showSection(sectionId);
+  } else {
+    alert('Sorry, we could not find a matching page for "' + (title || 'this service') + '".');
+  }
+}
+window.goToSectionForTitle = goToSectionForTitle; // expose for inline onclick
 
   </script>
 </body>
