@@ -511,60 +511,63 @@ document.querySelectorAll('#menu a').forEach(link => {
     }
 
     async function loadSectionContent(sectionId) {
-      const box = document.querySelector(`#${sectionId} .content-box`);
-      const docRef = db.collection('sections').doc(sectionId);
+  const box = document.querySelector(`#${sectionId} .content-box`);
+  const docRef = db.collection('sections').doc(sectionId);
 
-      try {
-        const doc = await docRef.get();
+  try {
+    const doc = await docRef.get();
 
-        if (doc.exists) {
-          const data = doc.data();
+    if (doc.exists) {
+      const data = doc.data();
 
-          const entries = data.entries || 
-            ((data.description || data.image)
-              ? [{ description: data.description || '', image: data.image || null }]
-              : []);
+      const entries = data.entries || 
+        ((data.description || data.image)
+          ? [{ description: data.description || '', image: data.image || null }]
+          : []);
 
-          if (entries.length === 0) {
-            box.innerHTML = `<p>No content available for this section.</p>`;
-            return;
-          }
-
-          let html = '';
-
-          entries.forEach((entry, idx) => {
-            html += '<div class="entry">';
-
-            // Show header above image
-            if (entry.header) {
-              html += `<h3>${entry.header}</h3>`;
-            }
-
-            // Use round image ONLY for the first image on default-content
-            if (entry.image) {
-              const isDefault = sectionId === 'default-content' && idx === 0;
-              const imgClass = isDefault ? 'round-image' : '';
-              html += `<img src="${entry.image}" class="${imgClass}" alt="${entry.header || 'Image'}" />`;
-            }
-
-            html += `<p>${entry.description || '[No description]'}</p>`;
-            html += '</div>';
-          });
-
-          box.innerHTML = html;
-        } else {
-          box.innerHTML = `<p>No content available for this section.</p>`;
-        }
-      } catch (error) {
-        console.error("Error loading section:", error);
-        box.innerHTML = `<p>Failed to load content: ${error.message}</p>`;
+      if (entries.length === 0) {
+        box.innerHTML = `<p>No content available for this section.</p>`;
+        return;
       }
+
+      let html = '';
+
+      entries.forEach((entry, idx) => {
+        html += '<div class="entry">';
+
+        // Show header above image
+        if (entry.header) {
+          html += `<h3>${entry.header}</h3>`;
+        }
+
+        // Use round image ONLY for the first image on default-content
+        if (entry.image) {
+          const isDefault = sectionId === 'default-content' && idx === 0;
+          const imgClass = isDefault ? 'round-image' : '';
+          html += `<img src="${entry.image}" class="${imgClass}" alt="${entry.header || 'Image'}" />`;
+        }
+
+        html += `<p>${entry.description || '[No description]'}</p>`;
+
+        // ✅ Button goes HERE — inside the loop, before closing the card
+        if (sectionId === 'default-content' && entry.header) {
+          const safeHeader = String(entry.header).replace(/'/g, "\\'");
+          html += `<button class="action-btn" aria-label="View and schedule ${safeHeader}" onclick="goToSectionForTitle('${safeHeader}')">VIEW & SCHEDULE</button>`;
+        }
+
+        html += '</div>';
+      });
+
+      box.innerHTML = html;
+    } else {
+      box.innerHTML = `<p>No content available for this section.</p>`;
     }
-    // Add the centered yellow action button only on the default page (home)
-if (sectionId === 'default-content' && entry.header) {
-  const safeHeader = String(entry.header).replace(/'/g, "\\'");
-  html += `<button class="action-btn" aria-label="View and schedule ${safeHeader}" onclick="goToSectionForTitle('${safeHeader}')">VIEW & SCHEDULE</button>`;
+  } catch (error) {
+    console.error("Error loading section:", error);
+    box.innerHTML = `<p>Failed to load content: ${error.message}</p>`;
+  }
 }
+
 
     let selectedRating = 0;
 
