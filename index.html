@@ -550,7 +550,7 @@ document.querySelectorAll('#menu a').forEach(link => {
         html += `<p>${entry.description || '[No description]'}</p>`;
 
         // ✅ Button goes HERE — inside the loop, before closing the card
-        if (sectionId === 'default-content' && entry.header) {
+        if (sectionId === 'default-content' && entry.header && idx !== 0) {
           const safeHeader = String(entry.header).replace(/'/g, "\\'");
           html += `<button class="action-btn" aria-label="View and schedule ${safeHeader}" onclick="goToSectionForTitle('${safeHeader}')">VIEW & SCHEDULE</button>`;
         }
