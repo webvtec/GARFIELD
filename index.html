@@ -428,6 +428,20 @@
     <button id="login-submit" style="width:100%; padding:12px; background:#177FB9; color:#fff; border:none; border-radius:6px; cursor:pointer;">Login</button>
   </div>
 </div>
+  
+<div id="schedule-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:#fff; padding:30px 20px; border-radius:10px; max-width:400px; width:90%; text-align:left; box-shadow:0 0 20px rgba(0,0,0,0.3); position:relative;">
+    <button onclick="closeScheduleForm()" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:20px; cursor:pointer;">&times;</button>
+    <h2 style="margin-top:0;">Schedule Service</h2>
+    <p id="serviceNameLabel" style="font-weight:bold;"></p>
+    <input type="text" placeholder="Your Name" id="schedName" style="width:100%; padding:10px; margin-bottom:10px; border-radius:6px; border:1px solid #ccc;" />
+    <input type="email" placeholder="Your Email" id="schedEmail" style="width:100%; padding:10px; margin-bottom:10px; border-radius:6px; border:1px solid #ccc;" />
+    <input type="tel" placeholder="Your Phone" id="schedPhone" style="width:100%; padding:10px; margin-bottom:10px; border-radius:6px; border:1px solid #ccc;" />
+    <textarea placeholder="Describe your project..." id="schedMessage" style="width:100%; padding:10px; margin-bottom:10px; height:80px; border-radius:6px; border:1px solid #ccc;"></textarea>
+    <button onclick="submitScheduleForm()" style="width:100%; background:#FFD400; color:#000; padding:12px; border:none; border-radius:6px; font-weight:600;">Submit</button>
+    <p id="schedConfirmMsg" style="color:green; margin-top:10px;"></p>
+  </div>
+</div>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -554,10 +568,15 @@ document.querySelectorAll('#menu a').forEach(link => {
 
         html += `<p>${entry.description || '[No description]'}</p>`;
 
-        // ✅ Button goes HERE — inside the loop, before closing the card
+        // ✅ VIEW & SCHEDULE button for default-content entries (excluding first card)
         if (sectionId === 'default-content' && entry.header && idx !== 0) {
           const safeHeader = String(entry.header).replace(/'/g, "\\'");
           html += `<button class="action-btn" aria-label="View and schedule ${safeHeader}" onclick="goToSectionForTitle('${safeHeader}')">VIEW & SCHEDULE</button>`;
+        }
+
+        // ✅ SCHEDULE NOW button for paint sections
+        if (['res-exterior', 'res-interior', 'com-exterior', 'com-interior'].includes(sectionId)) {
+          html += `<button class="action-btn" onclick="openScheduleForm('${entry.header || ''}')">SCHEDULE NOW</button>`;
         }
 
         html += '</div>';
@@ -779,6 +798,37 @@ function goToSectionForTitle(title) {
     alert('Sorry, we could not find a matching page for "' + (title || 'this service') + '".');
   }
 }
+
+    function openScheduleForm(serviceName = '') {
+  document.getElementById('serviceNameLabel').textContent = serviceName;
+  document.getElementById('schedConfirmMsg').textContent = '';
+  document.getElementById('schedName').value = '';
+  document.getElementById('schedEmail').value = '';
+  document.getElementById('schedPhone').value = '';
+  document.getElementById('schedMessage').value = '';
+  document.getElementById('schedule-modal').style.display = 'flex';
+}
+
+function closeScheduleForm() {
+  document.getElementById('schedule-modal').style.display = 'none';
+}
+
+function submitScheduleForm() {
+  const name = document.getElementById('schedName').value.trim();
+  const email = document.getElementById('schedEmail').value.trim();
+  const phone = document.getElementById('schedPhone').value.trim();
+  const message = document.getElementById('schedMessage').value.trim();
+
+  if (!name || !email || !phone || !message) {
+    alert('Please fill in all fields.');
+    return;
+  }
+
+  // This is a placeholder for actual handling (e.g., Firebase, EmailJS, etc.)
+  document.getElementById('schedConfirmMsg').textContent = 'Thank you! Your request has been submitted.';
+  setTimeout(closeScheduleForm, 2500);
+}
+
 window.goToSectionForTitle = goToSectionForTitle; // expose for inline onclick
 
   </script>
