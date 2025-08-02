@@ -344,6 +344,11 @@
   font-size: 1em;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
+    
+#serviceNameLabel div:first-child {
+  color: #177FB9;
+  letter-spacing: 0.5px;
+}
 
   </style>
 </head>
@@ -439,7 +444,10 @@
   <div style="background:#fff; padding:30px 20px; border-radius:10px; max-width:400px; width:90%; text-align:left; box-shadow:0 0 20px rgba(0,0,0,0.3); position:relative;">
     <button onclick="closeScheduleForm()" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:20px; cursor:pointer;">&times;</button>
     <h2 style="margin-top: 0; text-align: center;">SCHEDULE SERVICE</h2>
-    <p id="serviceNameLabel" style="font-weight:bold; text-align: center;"></p>
+    <div id="serviceNameLabel" style="text-align: center; margin-bottom: 10px;">
+  <div style="font-weight: bold; font-size: 0.95em;">CURRENT SERVICE</div>
+  <div id="currentServiceName" style="font-size: 1.05em; margin-top: 4px;"></div>
+</div>
 
     <input type="text" placeholder="Your Name" id="schedName" style="width:100%; padding:10px; margin-bottom:10px; border-radius:6px; border:1px solid #ccc;" />
     <input type="email" placeholder="Your Email" id="schedEmail" style="width:100%; padding:10px; margin-bottom:10px; border-radius:6px; border:1px solid #ccc;" />
@@ -838,12 +846,22 @@ function goToSectionForTitle(title) {
 }
 
     function openScheduleForm(serviceName = '') {
-  document.getElementById('serviceNameLabel').textContent = serviceName || 'Select a service below';
   document.getElementById('schedConfirmMsg').textContent = '';
   document.getElementById('schedName').value = '';
   document.getElementById('schedEmail').value = '';
   document.getElementById('schedPhone').value = '';
-  document.getElementById('schedService').selectedIndex = 0; // Reset dropdown
+  document.getElementById('schedService').selectedIndex = 0;
+
+  // Update the CURRENT SERVICE section
+  const currentServiceDiv = document.getElementById('currentServiceName');
+  if (serviceName && currentServiceDiv) {
+    currentServiceDiv.textContent = serviceName;
+    document.getElementById('serviceNameLabel').style.display = 'block';
+  } else {
+    currentServiceDiv.textContent = '';
+    document.getElementById('serviceNameLabel').style.display = 'none';
+  }
+
   document.getElementById('schedule-modal').style.display = 'flex';
 }
 
