@@ -838,12 +838,12 @@ function goToSectionForTitle(title) {
 }
 
     function openScheduleForm(serviceName = '') {
-  document.getElementById('serviceNameLabel').textContent = serviceName;
+  document.getElementById('serviceNameLabel').textContent = serviceName || 'Select a service below';
   document.getElementById('schedConfirmMsg').textContent = '';
   document.getElementById('schedName').value = '';
   document.getElementById('schedEmail').value = '';
   document.getElementById('schedPhone').value = '';
-  document.getElementById('schedMessage').value = '';
+  document.getElementById('schedService').selectedIndex = 0; // Reset dropdown
   document.getElementById('schedule-modal').style.display = 'flex';
 }
 
