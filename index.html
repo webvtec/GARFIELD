@@ -459,6 +459,7 @@
     <input type="text" placeholder="Your Name" id="schedName" style="width:100%; padding:10px; margin-bottom:10px; border-radius:6px; border:1px solid #ccc;" />
     <input type="email" placeholder="Your Email" id="schedEmail" style="width:100%; padding:10px; margin-bottom:10px; border-radius:6px; border:1px solid #ccc;" />
     <input type="tel" placeholder="Your Phone" id="schedPhone" style="width:100%; padding:10px; margin-bottom:10px; border-radius:6px; border:1px solid #ccc;" />
+    <input type="text" placeholder="Your Location" id="schedLocation" style="width:100%; padding:10px; margin-bottom:10px; border-radius:6px; border:1px solid #ccc;" />
 
     <label for="schedService" style="font-weight:bold; display:block; margin-bottom:6px;">ADD MORE SERVICES:</label>
 <select id="schedService" multiple required
@@ -857,11 +858,13 @@ function goToSectionForTitle(title) {
     function openScheduleForm(serviceName = '') {
   initialService = serviceName || ''; // store globally
 
+  // Reset form fields
   document.getElementById('schedConfirmMsg').textContent = '';
   document.getElementById('schedName').value = '';
   document.getElementById('schedEmail').value = '';
   document.getElementById('schedPhone').value = '';
-  document.getElementById('schedService').selectedIndex = 0;
+  document.getElementById('schedLocation').value = ''; // ✅ Reset location
+  document.getElementById('schedService').selectedIndex = -1; // ✅ No preselected option
 
   const currentServiceDiv = document.getElementById('currentServiceName');
   const dropdown = document.getElementById('schedService');
@@ -871,10 +874,14 @@ function goToSectionForTitle(title) {
   currentServiceDiv.textContent = services.join(', ');
   document.getElementById('serviceNameLabel').style.display = services.length ? 'block' : 'none';
 
-  // 🟡 Add change event listener
-  dropdown.addEventListener('change', () => {
-    const selected = Array.from(dropdown.selectedOptions).map(opt => opt.value);
-    const combined = [...new Set([initialService, ...selected].filter(Boolean))]; // remove duplicates & blanks
+  // 🟡 Remove previous event listener (prevent multiple triggers)
+  const newDropdown = dropdown.cloneNode(true);
+  dropdown.parentNode.replaceChild(newDropdown, dropdown);
+
+  // 🔄 Add change listener to update CURRENT SERVICE(S)
+  newDropdown.addEventListener('change', () => {
+    const selected = Array.from(newDropdown.selectedOptions).map(opt => opt.value);
+    const combined = [...new Set([initialService, ...selected].filter(Boolean))]; // remove duplicates
 
     currentServiceDiv.textContent = combined.join(', ');
     document.getElementById('serviceNameLabel').style.display = combined.length ? 'block' : 'none';
@@ -882,6 +889,7 @@ function goToSectionForTitle(title) {
 
   document.getElementById('schedule-modal').style.display = 'flex';
 }
+
 
 function closeScheduleForm() {
   document.getElementById('schedule-modal').style.display = 'none';
@@ -891,6 +899,7 @@ function submitScheduleForm() {
   const name = document.getElementById('schedName').value.trim();
   const email = document.getElementById('schedEmail').value.trim();
   const phone = document.getElementById('schedPhone').value.trim();
+  const location = document.getElementById('schedLocation').value.trim(); // ✅ new
 
   const selected = Array.from(document.getElementById('schedService').selectedOptions)
     .map(opt => opt.value)
@@ -900,10 +909,13 @@ function submitScheduleForm() {
   const allServices = [...new Set([initialService, ...selected].filter(Boolean))];
   const message = allServices.join(', ');
 
-  if (!name || !email || !phone || allServices.length === 0) {
+  if (!name || !email || !phone || !location || allServices.length === 0) {
     alert('Please fill in all fields and select at least one service.');
     return;
   }
+
+  // You can log or submit this info as needed
+  console.log('Form submitted with:', { name, email, phone, location, services: allServices });
 
   document.getElementById('schedConfirmMsg').textContent = 'Thank you! Your request has been submitted.';
   setTimeout(closeScheduleForm, 2500);
