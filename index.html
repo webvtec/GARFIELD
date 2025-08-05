@@ -855,35 +855,29 @@ function goToSectionForTitle(title) {
 }
 
     function openScheduleForm(serviceName = '') {
+  initialService = serviceName || ''; // store globally
+
   document.getElementById('schedConfirmMsg').textContent = '';
   document.getElementById('schedName').value = '';
   document.getElementById('schedEmail').value = '';
   document.getElementById('schedPhone').value = '';
   document.getElementById('schedService').selectedIndex = 0;
 
-  // Update the CURRENT SERVICE section
-    const currentServiceDiv = document.getElementById('currentServiceName');
+  const currentServiceDiv = document.getElementById('currentServiceName');
   const dropdown = document.getElementById('schedService');
 
-  // Set the initial state
-  if (serviceName && currentServiceDiv) {
-    currentServiceDiv.textContent = Array.isArray(serviceName) ? serviceName.join(', ') : serviceName;
-    document.getElementById('serviceNameLabel').style.display = 'block';
-  } else {
-    currentServiceDiv.textContent = '';
-    document.getElementById('serviceNameLabel').style.display = 'none';
-  }
+  // Display initial service
+  const services = initialService ? [initialService] : [];
+  currentServiceDiv.textContent = services.join(', ');
+  document.getElementById('serviceNameLabel').style.display = services.length ? 'block' : 'none';
 
-  // 🟡 Add listener to update CURRENT SERVICE(S)
+  // 🟡 Add change event listener
   dropdown.addEventListener('change', () => {
-    const selected = Array.from(dropdown.selectedOptions).map(opt => opt.value).filter(v => v && v !== 'NONE');
-    if (selected.length > 0) {
-      document.getElementById('serviceNameLabel').style.display = 'block';
-      currentServiceDiv.textContent = selected.join(', ');
-    } else {
-      currentServiceDiv.textContent = '';
-      document.getElementById('serviceNameLabel').style.display = 'none';
-    }
+    const selected = Array.from(dropdown.selectedOptions).map(opt => opt.value);
+    const combined = [...new Set([initialService, ...selected].filter(Boolean))]; // remove duplicates & blanks
+
+    currentServiceDiv.textContent = combined.join(', ');
+    document.getElementById('serviceNameLabel').style.display = combined.length ? 'block' : 'none';
   });
 
   document.getElementById('schedule-modal').style.display = 'flex';
@@ -898,19 +892,19 @@ function submitScheduleForm() {
   const email = document.getElementById('schedEmail').value.trim();
   const phone = document.getElementById('schedPhone').value.trim();
 
-  // Get all selected services, excluding the placeholder
   const selected = Array.from(document.getElementById('schedService').selectedOptions)
     .map(opt => opt.value)
     .filter(val => val && val !== '-- Select services (optional) --');
 
-  const message = selected.join(', ');
+  // Combine initial + additional (no duplicates)
+  const allServices = [...new Set([initialService, ...selected].filter(Boolean))];
+  const message = allServices.join(', ');
 
-  if (!name || !email || !phone || selected.length === 0) {
+  if (!name || !email || !phone || allServices.length === 0) {
     alert('Please fill in all fields and select at least one service.');
     return;
   }
 
-  // ✅ Replace this with Firebase or EmailJS if desired
   document.getElementById('schedConfirmMsg').textContent = 'Thank you! Your request has been submitted.';
   setTimeout(closeScheduleForm, 2500);
 }
