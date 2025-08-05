@@ -357,6 +357,36 @@
   background-color: #f1f1f1;
 }
 
+    /* Default (mobile/tablet) modal form size */
+#schedule-modal .modal-content {
+  background: #fff;
+  padding: 32px 20px;
+  border-radius: 12px;
+  max-width: 420px;
+  width: 90%;
+  box-sizing: border-box;
+  text-align: center;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+/* Make form larger on desktops */
+@media (min-width: 768px) {
+  #schedule-modal .modal-content {
+    max-width: 600px;
+    padding: 40px 40px;
+    font-size: 1.1em;
+  }
+
+  #schedule-modal input,
+  #schedule-modal select,
+  #schedule-modal button {
+    font-size: 1.05em;
+    padding: 16px 14px;
+  }
+}
+
+
   </style>
 </head>
 <body>
@@ -448,7 +478,7 @@
 </div>
   
 <div id="schedule-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
-<div style="background:#fff; padding:30px 24px 30px 24px; border-radius:10px; max-width:400px; width:90%; box-sizing:border-box; text-align:left; box-shadow:0 0 20px rgba(0,0,0,0.3); position:relative;">
+<div class="modal-content">
     <button onclick="closeScheduleForm()" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:20px; cursor:pointer;">&times;</button>
     <h2 style="margin-top: 0; text-align: center;">SCHEDULE SERVICE</h2>
     <div id="serviceNameLabel" style="text-align: center; margin-bottom: 10px;">
