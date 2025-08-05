@@ -464,7 +464,7 @@
 <select id="schedService" multiple required
   style="width:100%; padding:10px; margin-bottom:10px; border-radius:6px; border:1px solid #ccc; max-height:180px; overflow-y:auto;">
   <optgroup label="Residential Exterior" style="text-align:center;">
-    <option>NONE</option>
+    <option disabled selected value="">-- Select services (optional) --</option>
     <option>Power Washing</option>
     <option>Limewashing</option>
     <option>Deck Staining</option>
@@ -862,17 +862,29 @@ function goToSectionForTitle(title) {
   document.getElementById('schedService').selectedIndex = 0;
 
   // Update the CURRENT SERVICE section
-  const currentServiceDiv = document.getElementById('currentServiceName');
-  if (serviceName && currentServiceDiv) {
-    currentServiceDiv.textContent = serviceName
-  ? Array.isArray(serviceName) ? serviceName.join(', ') : serviceName
-  : '';
+    const currentServiceDiv = document.getElementById('currentServiceName');
+  const dropdown = document.getElementById('schedService');
 
+  // Set the initial state
+  if (serviceName && currentServiceDiv) {
+    currentServiceDiv.textContent = Array.isArray(serviceName) ? serviceName.join(', ') : serviceName;
     document.getElementById('serviceNameLabel').style.display = 'block';
   } else {
     currentServiceDiv.textContent = '';
     document.getElementById('serviceNameLabel').style.display = 'none';
   }
+
+  // 🟡 Add listener to update CURRENT SERVICE(S)
+  dropdown.addEventListener('change', () => {
+    const selected = Array.from(dropdown.selectedOptions).map(opt => opt.value).filter(v => v && v !== 'NONE');
+    if (selected.length > 0) {
+      document.getElementById('serviceNameLabel').style.display = 'block';
+      currentServiceDiv.textContent = selected.join(', ');
+    } else {
+      currentServiceDiv.textContent = '';
+      document.getElementById('serviceNameLabel').style.display = 'none';
+    }
+  });
 
   document.getElementById('schedule-modal').style.display = 'flex';
 }
@@ -885,17 +897,24 @@ function submitScheduleForm() {
   const name = document.getElementById('schedName').value.trim();
   const email = document.getElementById('schedEmail').value.trim();
   const phone = document.getElementById('schedPhone').value.trim();
-  const selected = Array.from(document.getElementById('schedService').selectedOptions).map(opt => opt.value);
-const message = selected.join(', ');
-  if (!name || !email || !phone || !message) {
-    alert('Please fill in all fields.');
+
+  // Get all selected services, excluding the placeholder
+  const selected = Array.from(document.getElementById('schedService').selectedOptions)
+    .map(opt => opt.value)
+    .filter(val => val && val !== '-- Select services (optional) --');
+
+  const message = selected.join(', ');
+
+  if (!name || !email || !phone || selected.length === 0) {
+    alert('Please fill in all fields and select at least one service.');
     return;
   }
 
-  // This is a placeholder for actual handling (e.g., Firebase, EmailJS, etc.)
+  // ✅ Replace this with Firebase or EmailJS if desired
   document.getElementById('schedConfirmMsg').textContent = 'Thank you! Your request has been submitted.';
   setTimeout(closeScheduleForm, 2500);
 }
+
 
 window.goToSectionForTitle = goToSectionForTitle; // expose for inline onclick
 
