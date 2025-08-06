@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Garfield Painting</title>
@@ -535,12 +540,7 @@
     <p id="schedConfirmMsg" style="color:green; margin-top:10px;"></p>
   </div>
 </div>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-
+  
   <!-- Firebase Setup -->
   <script>
   const firebaseConfig = {
@@ -968,8 +968,7 @@ function submitScheduleForm() {
   .then(response => response.json())
   .then(data => {
     if (data.ok) {
-      document.getElementById('schedConfirmMsg').textContent = 'Thank you! Your request has been submitted.';
-      setTimeout(closeScheduleForm, 2500);
+      showConfirmationModal();
     } else {
       alert('Failed to send message to Telegram.');
     }
@@ -980,6 +979,14 @@ function submitScheduleForm() {
   });
 }
 
+    function showConfirmationModal() {
+  document.getElementById('confirmation-modal').style.display = 'flex';
+}
+
+function closeConfirmationModal() {
+  document.getElementById('confirmation-modal').style.display = 'none';
+  closeScheduleForm();
+}
 
 window.goToSectionForTitle = goToSectionForTitle; // expose for inline onclick
 
