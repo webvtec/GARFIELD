@@ -936,13 +936,12 @@ function submitScheduleForm() {
   const name = document.getElementById('schedName').value.trim();
   const email = document.getElementById('schedEmail').value.trim();
   const phone = document.getElementById('schedPhone').value.trim();
-  const location = document.getElementById('schedLocation').value.trim(); // ✅ new
+  const location = document.getElementById('schedLocation').value.trim();
 
   const selected = Array.from(document.getElementById('schedService').selectedOptions)
     .map(opt => opt.value)
-    .filter(val => val && val !== '-- Select services (optional) --');
+    .filter(val => val);
 
-  // Combine initial + additional (no duplicates)
   const allServices = [...new Set([initialService, ...selected].filter(Boolean))];
   const message = allServices.join(', ');
 
@@ -951,11 +950,34 @@ function submitScheduleForm() {
     return;
   }
 
-  // You can log or submit this info as needed
-  console.log('Form submitted with:', { name, email, phone, location, services: allServices });
+  const botToken = 'YOUR_BOT_TOKEN';
+  const chatId = 'YOUR_CHAT_ID';
+  const text = `📬 *New Booking Request*\n\n👤 *Name:* ${name}\n📧 *Email:* ${email}\n📞 *Phone:* ${phone}\n📍 *Location:* ${location}\n🛠️ *Services:* ${message}`;
 
-  document.getElementById('schedConfirmMsg').textContent = 'Thank you! Your request has been submitted.';
-  setTimeout(closeScheduleForm, 2500);
+  fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      chat_id: chatId,
+      text: text,
+      parse_mode: 'Markdown'
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.ok) {
+      document.getElementById('schedConfirmMsg').textContent = 'Thank you! Your request has been submitted.';
+      setTimeout(closeScheduleForm, 2500);
+    } else {
+      alert('Failed to send message to Telegram.');
+    }
+  })
+  .catch(error => {
+    console.error('Telegram API error:', error);
+    alert('Error sending to Telegram.');
+  });
 }
 
 
