@@ -536,12 +536,12 @@
   </optgroup>
 </select>
 
-    <button onclick="submitScheduleForm()" style="width:100%; background:#FFD400; color:#000; padding:12px; border:none; border-radius:6px; font-weight:600;">Submit</button>
-    <p id="schedConfirmMsg" style="color:green; margin-top:10px;"></p>
-  </div>
-</div>
+    <!-- Submit Button -->
+<button type="button" onclick="submitScheduleForm()" style="width:100%; background:#FFD400; color:#000; padding:12px; border:none; border-radius:6px; font-weight:600;">
+  Submit
+</button>
 
-  <!-- ✅ Confirmation Modal -->
+<!-- ✅ Confirmation Modal -->
 <div id="confirmation-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;">
   <div style="background:#fff; padding:30px 20px; border-radius:12px; max-width:360px; width:90%; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.2); position:relative;">
     
@@ -554,7 +554,9 @@
     <h3 style="color:#333; margin-bottom:10px;">Request Submitted</h3>
     <p style="color:#555; font-size:1em;">You will receive a call within the next 24 hours.</p>
 
-    <button onclick="closeConfirmationModal()" style="margin-top:20px; background:#4CAF50; color:#fff; padding:10px 22px; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">OK</button>
+    <button onclick="closeConfirmationModal()" style="margin-top:20px; background:#4CAF50; color:#fff; padding:10px 22px; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">
+      OK
+    </button>
   </div>
 </div>
   
@@ -983,19 +985,13 @@ function submitScheduleForm() {
     })
   })
   .then(response => response.json())
-  .then(response => response.json())
-.then(data => {
-  console.log("Telegram response:", data);
-  showConfirmationModal(); // Always show success modal for now
-})
-.catch(error => {
-  console.error('Telegram API error:', error);
-  alert('Something went wrong. Please try again.');
-});
+  .then(data => {
+    console.log("Telegram response:", data);
+    showConfirmationModal(); // Show success modal
   })
   .catch(error => {
     console.error('Telegram API error:', error);
-    alert('Error sending to Telegram.');
+    alert('Something went wrong. Please try again.');
   });
 }
 
