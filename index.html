@@ -912,15 +912,13 @@ function goToSectionForTitle(title) {
 }
 
     function openScheduleForm(serviceName = '') {
-  initialService = serviceName || ''; // store globally
+  initialService = serviceName || '';
 
   // Reset form fields
-  document.getElementById('schedConfirmMsg').textContent = '';
   document.getElementById('schedName').value = '';
   document.getElementById('schedEmail').value = '';
   document.getElementById('schedPhone').value = '';
-  document.getElementById('schedLocation').value = ''; // ✅ Reset location
-  document.getElementById('schedService').selectedIndex = -1; // ✅ No preselected option
+  document.getElementById('schedLocation').value = '';
 
   const currentServiceDiv = document.getElementById('currentServiceName');
   const dropdown = document.getElementById('schedService');
@@ -930,15 +928,15 @@ function goToSectionForTitle(title) {
   currentServiceDiv.textContent = services.join(', ');
   document.getElementById('serviceNameLabel').style.display = services.length ? 'block' : 'none';
 
-  // 🟡 Remove previous event listener (prevent multiple triggers)
+  // 🟢 Remove old event listener by cloning dropdown
   const newDropdown = dropdown.cloneNode(true);
+  newDropdown.selectedIndex = -1;
   dropdown.parentNode.replaceChild(newDropdown, dropdown);
 
-  // 🔄 Add change listener to update CURRENT SERVICE(S)
+  // 🔁 Add listener to update service name on change
   newDropdown.addEventListener('change', () => {
     const selected = Array.from(newDropdown.selectedOptions).map(opt => opt.value);
-    const combined = [...new Set([initialService, ...selected].filter(Boolean))]; // remove duplicates
-
+    const combined = [...new Set([initialService, ...selected].filter(Boolean))];
     currentServiceDiv.textContent = combined.join(', ');
     document.getElementById('serviceNameLabel').style.display = combined.length ? 'block' : 'none';
   });
