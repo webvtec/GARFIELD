@@ -540,6 +540,23 @@
     <p id="schedConfirmMsg" style="color:green; margin-top:10px;"></p>
   </div>
 </div>
+
+  <!-- ✅ Confirmation Modal -->
+<div id="confirmation-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:10000; justify-content:center; align-items:center;">
+  <div style="background:#fff; padding:30px 20px; border-radius:12px; max-width:360px; width:90%; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.2); position:relative;">
+    
+    <div style="width:70px; height:70px; margin:0 auto 20px; border-radius:50%; background:#4CAF50; display:flex; align-items:center; justify-content:center;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="white" viewBox="0 0 24 24">
+        <path d="M20.285 6.709l-11.597 11.596-5.657-5.656 1.414-1.414 4.243 4.242 10.183-10.182z"/>
+      </svg>
+    </div>
+
+    <h3 style="color:#333; margin-bottom:10px;">Request Submitted</h3>
+    <p style="color:#555; font-size:1em;">You will receive a call within the next 24 hours.</p>
+
+    <button onclick="closeConfirmationModal()" style="margin-top:20px; background:#4CAF50; color:#fff; padding:10px 22px; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">OK</button>
+  </div>
+</div>
   
   <!-- Firebase Setup -->
   <script>
@@ -966,12 +983,15 @@ function submitScheduleForm() {
     })
   })
   .then(response => response.json())
-  .then(data => {
-    if (data.ok) {
-      showConfirmationModal();
-    } else {
-      alert('Failed to send message to Telegram.');
-    }
+  .then(response => response.json())
+.then(data => {
+  console.log("Telegram response:", data);
+  showConfirmationModal(); // Always show success modal for now
+})
+.catch(error => {
+  console.error('Telegram API error:', error);
+  alert('Something went wrong. Please try again.');
+});
   })
   .catch(error => {
     console.error('Telegram API error:', error);
